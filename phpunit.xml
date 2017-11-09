@@ -1,16 +1,15 @@
 <phpunit bootstrap="vendor/autoload.php">
     <testsuites>
-        <testsuite name="Modules/Base">
-            <directory>Modules/Base/test</directory>
+        <testsuite name="Base">
+            <directory>test</directory>
         </testsuite>
     </testsuites>
     <php>
-        <env name="FILE_LOGGER_FILE_DIR_PATH" value="/Modules/Base/test/Logger/"/>
+        <env name="FILE_LOGGER_FILE_DIR_PATH" value="/test/Logger/"/>
         <env name="FILE_LOGGER_FILE_NAME" value="file_logger.log"/>
         <env name="DATABASE_ADDRESS" value="192.168.33.10:27017"/>
         <env name="DATABASE_NAME" value="framework-test"/>
         <env name="PRIVATE_MAIL_FROM" value="no-reply@the-shop.hr" />
         <env name="WEB_DOMAIN" value="test-theshop" />
-        <env name="FILE_TO_UPLOAD_TEST_PATH" value="/Modules/Base/test/FileUpload/test.txt"/>
     </php>
 </phpunit>
