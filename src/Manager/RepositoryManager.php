@@ -6,6 +6,7 @@ use Framework\Base\Application\ApplicationAwareInterface;
 use Framework\Base\Application\ApplicationAwareTrait;
 use Framework\Base\Database\DatabaseAdapterInterface;
 use Framework\Base\Repository\BrunoRepositoryInterface;
+use Zend\Stdlib\ArrayUtils;
 
 /**
  * Class RepositoryManager
@@ -126,10 +127,6 @@ class RepositoryManager implements RepositoryManagerInterface, ApplicationAwareI
 
         array_push($this->registeredRepositories, $fullyQualifiedClassName);
 
-        /**@todo implement `array_unique()` differently
-         *          since its not meant to work on multidimensional arrays
-         *          and it has big impact on performance
-         */
         $this->registeredRepositories = array_unique($this->registeredRepositories, SORT_REGULAR);
 
         return $this;
@@ -142,13 +139,9 @@ class RepositoryManager implements RepositoryManagerInterface, ApplicationAwareI
      */
     public function registerRepositories(array $fullyQualifiedClassNames = [])
     {
-        $this->registeredRepositories = array_merge($this->registeredRepositories, $fullyQualifiedClassNames);
+        $this->registeredRepositories = ArrayUtils::merge($this->registeredRepositories, $fullyQualifiedClassNames);
 
-        /**@todo implement `array_unique()` differently
-         *          since its not meant to work on multidimensional arrays
-         *          and it has big impact on performance
-         */
-//        $this->registeredRepositories = array_unique($this->registeredRepositories, SORT_REGULAR);
+        /** @todo check if zend `merge` works on multidimensional arrays */
 
         return $this;
     }
@@ -172,13 +165,9 @@ class RepositoryManager implements RepositoryManagerInterface, ApplicationAwareI
      */
     public function registerResources(array $resourcesMap = [])
     {
-        $this->registeredResources = array_merge_recursive($this->registeredResources, $resourcesMap);
+        $this->registeredResources = ArrayUtils::merge($this->registeredResources, $resourcesMap);
 
-        /**@todo implement `array_unique()` differently
-         *          since its not meant to work on multidimensional arrays
-         *          and it has big impact on performance
-         */
-//        $this->registeredRepositories = array_unique($this->registeredRepositories, SORT_REGULAR);
+        /** @todo check if zend `merge` works on multidimensional arrays */
 
         foreach ($resourcesMap as $resourceName => $repository) {
             if (isset($this->primaryAdapters[$resourceName]) === false) {
@@ -197,13 +186,9 @@ class RepositoryManager implements RepositoryManagerInterface, ApplicationAwareI
      */
     public function registerModelFields(array $modelFieldsMap = [])
     {
-        $this->registeredModelFields = array_merge($this->registeredModelFields, $modelFieldsMap);
+        $this->registeredModelFields = ArrayUtils::merge($this->registeredModelFields, $modelFieldsMap);
 
-        /**@todo implement `array_unique()` differently
-         *          since its not meant to work on multidimensional arrays
-         *          and it has big impact on performance
-         */
-//        $this->registeredModelFields = array_unique($this->registeredModelFields, SORT_REGULAR);
+        /** @todo check if zend `merge` works on multidimensional arrays */
 
         return $this;
     }

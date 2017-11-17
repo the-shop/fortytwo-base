@@ -2,6 +2,8 @@
 
 namespace Framework\Base\Application;
 
+use Zend\Stdlib\ArrayUtils;
+
 /**
  * Class Configuration
  * @package Framework\Base\Application
@@ -79,7 +81,7 @@ class Configuration implements ConfigurationInterface
 
         $config = include $path;
 
-        $this->configuration = array_merge($this->configuration, $config);
+        $this->configuration = ArrayUtils::merge($this->configuration, $config);
 
         return $this;
     }
@@ -100,7 +102,7 @@ class Configuration implements ConfigurationInterface
 
         $config = json_decode(file_get_contents($path), true);
 
-        $this->configuration = array_merge($this->configuration, $config);
+        $this->configuration = ArrayUtils::merge($this->configuration, $config);
 
         return $this;
     }

@@ -29,8 +29,6 @@ class UnitTest extends TestCase
      * @param null   $name
      * @param array  $data
      * @param string $dataName
-     *
-     * @todo lose 42-RestApi and 42-CrudApi dependencies
      */
     public function __construct($name = null, array $data = [], $dataName = '')
     {

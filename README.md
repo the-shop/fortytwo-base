@@ -15,10 +15,8 @@ Install
 
 3rd party dependencies
 ---
-`mongodb/mongodb`  
 `sentry/sentry`  
 `guzzlehttp/guzzle`  
-`sendgrid/sendgrid`  
-`firebase/php-jwt`  
+`symfony/dotenv`  
 `php-amqplib/php-amqplib`  
-`aws/aws-sdk-php`
+`zendframework/zend-stdlib`
