@@ -20,8 +20,6 @@ class Configuration implements ConfigurationInterface
     public function __construct(array $configurationValues = [])
     {
         $this->configuration = $configurationValues;
-
-        return $this;
     }
 
     /**
@@ -67,7 +65,7 @@ class Configuration implements ConfigurationInterface
 
     /**
      * @param string $path
-     * @return $this
+     * @return \Framework\Base\Application\ConfigurationInterface
      * @todo discuss renaming to loadFromPhp
      */
     public function readFromPhp(string $path): ConfigurationInterface
@@ -88,7 +86,7 @@ class Configuration implements ConfigurationInterface
 
     /**
      * @param string $path
-     * @return $this
+     * @return \Framework\Base\Application\ConfigurationInterface
      * @todo discuss renaming to loadFromJson
      */
     public function readFromJson(string $path): ConfigurationInterface
@@ -133,5 +131,12 @@ class Configuration implements ConfigurationInterface
         }
 
         return $prev;
+    }
+
+    public static function random_string($length = 16)
+    {
+        return shell_exec(
+            "</dev/urandom tr -dc _A-Z-a-z-0-9-'`~!@#$%^&*()_+-=,.<>?|:;[]{}/' | head -c$length; echo ''"
+        );
     }
 }

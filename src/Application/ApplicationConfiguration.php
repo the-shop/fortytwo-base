@@ -13,6 +13,13 @@ class ApplicationConfiguration extends Configuration
      */
     private $registeredModules = [];
 
+    public function __construct(array $configurationValues = [])
+    {
+        parent::__construct($configurationValues);
+
+        $this->setRootPath();
+    }
+
     /**
      * @param array $modules
      */
@@ -27,5 +34,17 @@ class ApplicationConfiguration extends Configuration
     public function getRegisteredModules()
     {
         return $this->registeredModules;
+    }
+
+    public function setRootPath(): ConfigurationInterface
+    {
+        $this->setPathValue('rootPath', realpath(dirname(__FILE__, 6)));
+
+        return $this;
+    }
+
+    public function getRootPath()
+    {
+        return $this->getPathValue('rootPath');
     }
 }

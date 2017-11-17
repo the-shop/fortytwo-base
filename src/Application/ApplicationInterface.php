@@ -2,13 +2,10 @@
 
 namespace Framework\Base\Application;
 
-use Framework\Base\Auth\RequestAuthorization;
 use Framework\Base\Logger\LoggerInterface;
 use Framework\Base\Logger\LogInterface;
 use Framework\Base\Request\RequestInterface;
 use Framework\Base\Response\ResponseInterface;
-use Framework\Terminal\Commands\Cron\CronJob;
-use Framework\Terminal\Commands\Cron\CronJobInterface;
 
 /**
  * Interface ApplicationInterface
@@ -109,6 +106,11 @@ interface ApplicationInterface
     public function getService(string $serviceClass);
 
     /**
+     * @return array
+     */
+    public function getEvents(): array;
+
+    /**
      * @param ServiceInterface $service
      * @param bool $overwriteExisting
      * @return ApplicationInterface
@@ -116,8 +118,7 @@ interface ApplicationInterface
     public function registerService(ServiceInterface $service, bool $overwriteExisting = false);
 
     /**
-     * @return ApplicationConfiguration
-     * @todo return ConfigurationInterface ??
+     * @return \Framework\Base\Application\ConfigurationInterface
      */
     public function getConfiguration();
 
@@ -133,52 +134,4 @@ interface ApplicationInterface
      * @return mixed|\Psr\Http\Message\ResponseInterface
      */
     public function httpRequest(string $method, string $uri = '', array $params = []);
-
-    /**
-     * @param array $aclConfig
-     * @return mixed
-     */
-    public function setAclRules(array $aclConfig = []);
-
-    /**
-     * @return mixed
-     */
-    public function getAclRules();
-
-    /**
-     * @param string $path
-     *
-     * @return ApplicationInterface
-     */
-    public function setRootPath(string $path): ApplicationInterface;
-
-    /**
-     * @return null|string
-     */
-    public function getRootPath();
-
-    /**
-     * @param \Framework\Base\Auth\RequestAuthorization $requestAuthorization
-     *
-     * @return \Framework\Base\Application\ApplicationInterface
-     */
-    public function setRequestAuthorization(RequestAuthorization $requestAuthorization): ApplicationInterface;
-
-    /**
-     * @return null|RequestAuthorization
-     */
-    public function getRequestAuthorization();
-
-    /**
-     * @param \Framework\Terminal\Commands\Cron\CronJobInterface $cronJob
-     *
-     * @return \Framework\Base\Application\ApplicationInterface
-     * @todo lose 42-Yoda dependency
-     */
-    public function registerCronJob(CronJobInterface $cronJob): ApplicationInterface;
-
-    /**
-     * @return array
-     */
-    public function getRegisteredCronJobs(): array;
 }
