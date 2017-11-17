@@ -86,7 +86,7 @@ class RepositoryManager implements RepositoryManagerInterface, ApplicationAwareI
         /* @var BrunoRepositoryInterface $repository */
         $repository = new $repositoryClass();
         $repository->setRepositoryManager($this)
-                   ->setResourceName($resourceName)
+                   ->setCollection($resourceName)
                    ->setApplication($this->getApplication());
 
         return $repository;

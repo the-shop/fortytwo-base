@@ -5,9 +5,8 @@ namespace Framework\Base\Model;
 use Framework\Base\Application\ApplicationAwareTrait;
 use Framework\Base\Database\DatabaseAdapterInterface;
 use Framework\Base\Model\Modifiers\HashFilter;
-use Framework\Base\Mongo\MongoQuery;
 use Framework\Base\Model\Modifiers\FieldModifierInterface;
-use MongoDB\Model\BSONArray;
+use Framework\Base\Repository\BrunoRepositoryInterface;
 
 /**
  * Base Model for database
@@ -47,6 +46,11 @@ abstract class Bruno implements BrunoInterface
      * @var string
      */
     protected $collection = 'bruno';
+
+    /**
+     * @var BrunoRepositoryInterface|null
+     */
+    private $repository = null;
 
     /**
      * @var array
@@ -124,9 +128,7 @@ abstract class Bruno implements BrunoInterface
      */
     public function save()
     {
-        $query = new MongoQuery();
-        $query->setDatabase($this->getDatabase());
-        $query->setCollection($this->getCollection());
+        $query = $this->getRepository()->createNewQueryForModel($this);
 
         $adapters = $this->getDatabaseAdapters();
 
@@ -174,14 +176,13 @@ abstract class Bruno implements BrunoInterface
      */
     public function delete()
     {
-        $query = new MongoQuery();
-        $query->setDatabase($this->getDatabase());
-        $query->setCollection($this->getCollection());
-        $query->addAndCondition(
-            '_id',
-            '=',
-            $this->getId()
-        );
+        $query = $this->getRepository()
+                      ->createNewQueryForModel($this)
+                      ->addAndCondition(
+                          '_id',
+                          '=',
+                          $this->getId()
+                      );
 
         $adapters = $this->getDatabaseAdapters();
 
@@ -219,6 +220,26 @@ abstract class Bruno implements BrunoInterface
     public function getCollection()
     {
         return $this->collection;
+    }
+
+    /**
+     * @return BrunoRepositoryInterface|null
+     */
+    public function getRepository()
+    {
+        return $this->repository;
+    }
+
+    /**
+     * @param \Framework\Base\Repository\BrunoRepositoryInterface $repository
+     *
+     * @return \Framework\Base\Model\BrunoInterface
+     */
+    public function setRepository(BrunoRepositoryInterface $repository): BrunoInterface
+    {
+        $this->repository = $repository;
+
+        return $this;
     }
 
     /**
