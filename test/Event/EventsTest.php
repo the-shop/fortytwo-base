@@ -2,7 +2,7 @@
 
 namespace Framework\Base\Test\Event;
 
-use Framework\Base\Application\Exception\ExceptionHandler;
+use Framework\Base\Test\Dummies\TestListener;
 use Framework\Base\Test\UnitTest;
 
 /**

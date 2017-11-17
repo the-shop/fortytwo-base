@@ -1,13 +1,13 @@
 <?php
 
-namespace Framework\Base\Test\Event;
+namespace Framework\Base\Test\Dummies;
 
 use Framework\Base\Application\ApplicationAwareTrait;
 use Framework\Base\Event\ListenerInterface;
 
 /**
  * Class TestListener
- * @package Framework\BaseTest\Event
+ * @package Framework\Base\Test\Dummies
  */
 class TestListener implements ListenerInterface
 {

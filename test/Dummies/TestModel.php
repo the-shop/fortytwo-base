@@ -1,6 +1,6 @@
 <?php
 
-namespace Framework\Base\Test;
+namespace Framework\Base\Test\Dummies;
 
 use Framework\Base\Model\Bruno;
 

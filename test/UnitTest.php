@@ -4,21 +4,17 @@ namespace Framework\Base\Test;
 
 use Framework\Base\Application\ApplicationInterface;
 use Framework\Base\Application\ApplicationConfiguration;
-use Framework\Base\Application\BaseApplication;
 use Framework\Base\Request\RequestInterface;
+use Framework\Base\Test\Dummies\DummyApplication;
+use Framework\Base\Test\Dummies\MemoryRenderer;
+use Framework\Base\Test\Dummies\TestRepository;
 use PHPUnit\Framework\TestCase;
-use Framework\RestApi\Module as RestApiModule;
-use Framework\RestApi\RestApi;
-use Framework\RestApi\Listener\Acl;
-use Framework\CrudApi\Module as CrudApiModule;
-use Framework\CrudApi\Controller\Resource;
-use Framework\Http\Request\Request;
 
 /**
  * All tests should extend this class
  *
  * Class UnitTest
- * @package Framework\BaseTest
+ * @package Framework\Base\Test
  */
 class UnitTest extends TestCase
 {
@@ -26,16 +22,6 @@ class UnitTest extends TestCase
      * @var ApplicationInterface|null
      */
     private $application = null;
-
-    /**
-     * @var array
-     */
-    private $authModel = [];
-
-    /**
-     * @var array
-     */
-    private $fields = [];
 
     /**
      * UnitTest constructor.
@@ -51,25 +37,8 @@ class UnitTest extends TestCase
         parent::__construct($name, $data, $dataName);
 
         $appConfig = new ApplicationConfiguration();
-        $appConfig->setRegisteredModules(
-            [
-                RestApiModule::class,
-                CrudApiModule::class
-            ]
-        );
 
-        $this->application = new RestApi($appConfig);
-
-        // Remove render events from the application
-        $this->application->removeEventListeners(BaseApplication::EVENT_APPLICATION_RENDER_RESPONSE_PRE);
-        $this->application->removeEventListeners(BaseApplication::EVENT_APPLICATION_RENDER_RESPONSE_POST);
-
-        $this->application->removeEventListeners(Resource::EVENT_CRUD_API_RESOURCE_CREATE_POST);
-
-        $this->application->listen(
-            BaseApplication::EVENT_APPLICATION_HANDLE_REQUEST_PRE,
-            Acl::class
-        );
+        $this->application = new DummyApplication($appConfig);
     }
 
     /**
@@ -77,7 +46,7 @@ class UnitTest extends TestCase
      *
      * @return ApplicationInterface|null
      */
-    public function runApplication(RequestInterface $request)
+    protected function runApplication(RequestInterface $request)
     {
         $app = $this->application;
 
@@ -96,46 +65,6 @@ class UnitTest extends TestCase
     }
 
     /**
-     * @param string $method
-     * @param string $path
-     * @param array  $parameters
-     * @param array  $files
-     *
-     * @return \Framework\Base\Response\ResponseInterface
-     * @todo lose 42-Http dependency
-     */
-    public function makeHttpRequest(
-        string $method,
-        string $path,
-        array $parameters = [],
-        array $files = []
-    ) {
-        // Normalize input
-        $method = strtoupper($method);
-
-        // Build basic http request
-        $request = new Request();
-        $request->setMethod($method)
-                ->setUri($path);
-
-        switch ($method) {
-            case 'DELETE':
-            case 'PATCH':
-            case 'PUT':
-            case 'POST':
-                $request->setPost($parameters);
-                $request->setFiles($files);
-                break;
-
-            default:
-                $request->setQuery($parameters);
-        }
-
-        return $this->runApplication($request)
-                    ->getResponse();
-    }
-
-    /**
      * @return ApplicationInterface|null
      */
     protected function getApplication()
@@ -148,44 +77,25 @@ class UnitTest extends TestCase
     }
 
     /**
-     * Register Test Adapter, Repository, Resource, Model Fields, Auth Model
-     *
-     * @return void
-     */
-    public function loadTestClasses()
-    {
-        $this->authModel['tests'] = ['strategy' => 'Password', 'credentials' => ['email', 'password']];
-        $this->fields['tests'] = ["email" => ["label" => "Email", "type" => "string",],
-                                  "password" => ["label" => "Password", "type" => "password"],
-                                  "role" => ["label" => "Role", "type" => "string"]];
-        $repository = [TestModel::class => TestRepository::class];
-        $resource = ['tests' => TestRepository::class];
-
-        $adapter = new TestDatabaseAdapter();
-
-        $this->getApplication()
-             ->getRepositoryManager()
-             ->addModelAdapter('tests', $adapter)
-             ->setPrimaryAdapter('tests', $adapter)
-             ->registerRepositories($repository)
-             ->registerResources($resource)
-             ->registerModelFields($this->fields)
-             ->addAuthenticatableModels($this->authModel);
-    }
-
-    /**
+     * @param $modelsConfig
      * @return array
      */
-    public function getFields()
+    protected function generateModelsConfiguration(array $modelsConfig)
     {
-        return $this->fields;
+        $generatedConfiguration = [
+            'resources' => [],
+            'modelFields' => [],
+        ];
+        foreach ($modelsConfig as $modelName => $options) {
+            $generatedConfiguration['resources'][$options['collection']] = TestRepository::class;
+            $generatedConfiguration['modelFields'][$options['collection']] = $options['fields'];
+        }
+
+        return $generatedConfiguration;
     }
 
-    /**
-     * @return array
-     */
-    public function getAuthModel()
+    public function testIgnore()
     {
-        return $this->authModel;
+        $this->assertEquals(true, true);
     }
 }

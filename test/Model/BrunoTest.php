@@ -16,17 +16,49 @@ class BrunoTest extends UnitTest
      */
     public function testBrunoAddAttributesWithFieldModifiers()
     {
-        $model = $this->getApplication()
-            ->getRepositoryManager()
-            ->getRepositoryFromResourceName('users')
-            ->newModel()
-            ->addFieldFilter('name', new LowerCaseFilter())
-            ->addFieldFilter('email', new TrimFilter())
-            ->setAttributes([
-                'name' => 'TESTING',
-                'email' => ' test@test.com ',
-                'password' => 'test password',
-            ]);
+        $appConfig = $this->getApplication()
+                          ->getConfiguration();
+
+        $repositoryManager = $this->getApplication()
+                                  ->getRepositoryManager();
+
+        $appConfig->readFromJson(dirname(__DIR__) . '/Dummies/dummyConfigJson.json');
+        $appConfig->readFromPhp(dirname(__DIR__) . '/Dummies/dummyConfig.php');
+
+        // Format models configuration
+        $modelsConfiguration = $this->generateModelsConfiguration(
+            $appConfig->getPathValue('models')
+        );
+
+        $modelAdapters = $appConfig->getPathValue('modelAdapters');
+        // Register model adapters
+        foreach ($modelAdapters as $model => $adapters) {
+            foreach ($adapters as $adapter) {
+                $repositoryManager->addModelAdapter($model, new $adapter());
+            }
+        }
+
+        $primaryModelAdapter = $appConfig->getPathValue('primaryModelAdapter');
+        // Register model primary adapters
+        foreach ($primaryModelAdapter as $model => $primaryAdapter) {
+            $repositoryManager->setPrimaryAdapter($model, new $primaryAdapter());
+        }
+
+        // Register resources, repositories and model fields
+        $repositoryManager->registerResources($modelsConfiguration['resources'])
+                          ->registerRepositories($appConfig->getPathValue('repositories'))
+                          ->registerModelFields($modelsConfiguration['modelFields']);
+
+        $model = $repositoryManager->getRepositoryFromResourceName('tests')
+                                   ->newModel()
+                                   ->addFieldFilter('name', new LowerCaseFilter())
+                                   ->addFieldFilter('email', new TrimFilter())
+                                   ->setAttributes([
+                                       'name' => 'TESTING',
+                                       'email' => ' test@test.com ',
+                                       'password' => 'test password',
+                                                   ]
+                                   );
 
         $attributes = $model->getAttributes();
 

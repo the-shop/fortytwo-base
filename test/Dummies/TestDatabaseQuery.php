@@ -1,6 +1,6 @@
 <?php
 
-namespace Framework\Base\Test;
+namespace Framework\Base\Test\Dummies;
 
 use Framework\Base\Database\DatabaseQueryInterface;
 
@@ -12,6 +12,7 @@ class TestDatabaseQuery implements DatabaseQueryInterface
 //    private $limit = '';
 //    private $selectFields = [];
 //    private $conditions = [];
+
     /**
      * @param string $name
      *

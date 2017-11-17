@@ -1,6 +1,6 @@
 <?php
 
-namespace Framework\Base\Test;
+namespace Framework\Base\Test\Dummies;
 
 use Framework\Base\Render\Render;
 use Framework\Base\Response\ResponseInterface;

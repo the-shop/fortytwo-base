@@ -1,10 +1,10 @@
 <?php
 
-namespace Framework\Base\Test\Logger;
+namespace Framework\Base\Test\Dummies;
 
 /**
  * Class DummyClient
- * @package Framework\Base\Test\Logger
+ * @package Framework\Base\Test\Dummies
  */
 class DummyClient
 {

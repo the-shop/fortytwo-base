@@ -3,6 +3,7 @@
 namespace Framework\Base\Test\Application;
 
 use Framework\Base\Application\ServicesRegistry;
+use Framework\Base\Test\Dummies\SampleService;
 use Framework\Base\Test\UnitTest;
 
 class ServiceRegistryTest extends UnitTest

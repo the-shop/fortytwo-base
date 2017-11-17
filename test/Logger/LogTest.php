@@ -7,40 +7,48 @@ use Framework\Base\Test\UnitTest;
 
 class LogTest extends UnitTest
 {
+    private $payload;
+    /** @var  Log */
+    private $log;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->payload = 'test';
+        $this->log = new Log($this->payload);
+    }
+
+    public function tearDown()
+    {
+        parent::tearDown();
+    }
+
     public function testIsInstantiable()
     {
-        $payload = 'test';
-        $log = new Log($payload);
+        $this->assertInstanceOf(Log::class, $this->log);
 
-        $this->assertInstanceOf(Log::class, $log);
-
-        $this->assertEquals($payload, $log->getPayload());
+        $this->assertEquals($this->payload, $this->log->getPayload());
     }
 
     public function testSetData()
     {
-        $payload = 'test';
-        $log = new Log($payload);
+        $this->log->setData('testKey', 'testValue');
 
-        $log->setData('testKey', 'testValue');
+        $this->assertAttributeContains('testValue', 'data', $this->log);
 
-        $this->assertAttributeContains('testValue', 'data', $log);
+        $this->assertArrayHasKey('testKey', $this->log->getAllData());
 
-        $this->assertArrayHasKey('testKey', $log->getAllData());
-
-        $this->assertEquals('testValue', $log->getData('testKey'));
+        $this->assertEquals('testValue', $this->log->getData('testKey'));
     }
 
     public function testIsException()
     {
-        $payload = 'test';
-        $log = new Log($payload);
+        $this->assertFalse($this->log->isException());
 
-        $this->assertFalse($log->isException());
+        $payload = new \Exception($this->payload);
+        $this->log = new Log($payload);
 
-        $payload = new \Exception($payload);
-        $log = new Log($payload);
-
-        $this->assertTrue($log->isException());
+        $this->assertTrue($this->log->isException());
     }
 }

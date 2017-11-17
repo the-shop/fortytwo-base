@@ -1,6 +1,6 @@
 <?php
 
-namespace Framework\Base\Test\Application;
+namespace Framework\Base\Test\Dummies;
 
 use Framework\Base\Application\ApplicationAwareTrait;
 use Framework\Base\Application\ServiceInterface;
