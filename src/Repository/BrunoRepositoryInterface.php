@@ -15,15 +15,15 @@ use Framework\Base\Model\BrunoInterface;
 interface BrunoRepositoryInterface extends ApplicationAwareInterface
 {
     /**
-     * @param string $resourceName
+     * @param string $collection
      * @return BrunoRepositoryInterface;
      */
-    public function setResourceName(string $resourceName);
+    public function setCollection(string $collection);
 
     /**
      * @return string
      */
-    public function getResourceName();
+    public function getCollection();
 
     /**
      * @return DatabaseAdapterInterface|null

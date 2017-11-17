@@ -10,9 +10,10 @@ interface ResponseInterface
 {
     /**
      * @param $responseBody
-     * @return ResponseInterface
+     *
+     * @return \Framework\Base\Response\ResponseInterface
      */
-    public function setBody($responseBody);
+    public function setBody($responseBody): ResponseInterface;
 
     /**
      * @return mixed
@@ -21,32 +22,13 @@ interface ResponseInterface
 
     /**
      * @param int $code
-     * @return mixed
-     */
-    public function setCode(int $code);
-
-    /**
-     * @return mixed
-     */
-    public function getCode();
-
-    /**
-     * @param array $headers
      *
      * @return \Framework\Base\Response\ResponseInterface
      */
-    public function addHeaders(array $headers): ResponseInterface;
+    public function setCode(int $code): ResponseInterface;
 
     /**
-     * @param string $headerName
-     * @param string $headerValue
-     *
-     * @return \Framework\Base\Response\ResponseInterface
+     * @return int
      */
-    public function addHeader(string $headerName, string $headerValue): ResponseInterface;
-
-    /**
-     * @return array
-     */
-    public function getHeaders(): array;
+    public function getCode(): int;
 }

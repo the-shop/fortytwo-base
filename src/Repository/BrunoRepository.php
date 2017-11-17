@@ -18,7 +18,7 @@ abstract class BrunoRepository implements BrunoRepositoryInterface
     /**
      * @var string
      */
-    protected $resourceName = 'generic';
+    protected $collection = 'generic';
 
     /**
      * @var RepositoryManagerInterface|null
@@ -31,14 +31,14 @@ abstract class BrunoRepository implements BrunoRepositoryInterface
     private $modelAttributesDefinition = [];
 
     /**
-     * Sets `$resourceName` as the document collection
+     * Sets `$collection` as the document collection
      *
-     * @param string $resourceName
+     * @param string $collection
      * @return $this
      */
-    public function setResourceName(string $resourceName)
+    public function setCollection(string $collection)
     {
-        $this->resourceName = $resourceName;
+        $this->collection = $collection;
 
         return $this;
     }
@@ -46,9 +46,9 @@ abstract class BrunoRepository implements BrunoRepositoryInterface
     /**
      * @return string
      */
-    public function getResourceName()
+    public function getCollection()
     {
-        return $this->resourceName;
+        return $this->collection;
     }
 
     /**
@@ -56,7 +56,7 @@ abstract class BrunoRepository implements BrunoRepositoryInterface
      */
     public function getPrimaryAdapter()
     {
-        return $this->getRepositoryManager()->getPrimaryAdapter($this->resourceName);
+        return $this->getRepositoryManager()->getPrimaryAdapter($this->collection);
     }
 
     /**
@@ -65,7 +65,7 @@ abstract class BrunoRepository implements BrunoRepositoryInterface
     public function getDatabaseAdapters()
     {
         return $this->getRepositoryManager()
-            ->getModelAdapters($this->resourceName);
+            ->getModelAdapters($this->collection);
     }
 
     /**
@@ -103,8 +103,9 @@ abstract class BrunoRepository implements BrunoRepositoryInterface
 
         $model->defineModelAttributes($modelAttributesDefinition)
             ->setPrimaryKey($this->getModelPrimaryKey())
-            ->setCollection($this->resourceName)
+            ->setCollection($this->collection)
             ->setApplication($this->getApplication())
+            ->setRepository($this)
             ->setDatabaseAddress($config->getPathValue('env.DATABASE_ADDRESS'))
             ->setDatabase($config->getPathValue('env.DATABASE_NAME'));
 
@@ -135,6 +136,8 @@ abstract class BrunoRepository implements BrunoRepositoryInterface
                 return $field;
             }
         }
+
+        return null;
     }
 
     /**
@@ -282,7 +285,7 @@ abstract class BrunoRepository implements BrunoRepositoryInterface
             ->newQuery();
 
         $query->setDatabase($bruno->getDatabase());
-        $query->setCollection($bruno->getCollection());
+        $query->setCollection($this->getCollection());
 
         return $query;
     }
