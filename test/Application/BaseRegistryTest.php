@@ -5,8 +5,15 @@ namespace Framework\Base\Test\Application;
 use Framework\Base\Application\BaseRegistry;
 use Framework\Base\Test\UnitTest;
 
+/**
+ * Class BaseRegistryTest
+ * @package Framework\Base\Test\Application
+ */
 class BaseRegistryTest extends UnitTest
 {
+    /**
+     *
+     */
     public function testRegisterGetAndDelete()
     {
         $val = 1;
@@ -27,6 +34,9 @@ class BaseRegistryTest extends UnitTest
         $this->assertAttributeCount(0, 'content', $registry);
     }
 
+    /**
+     *
+     */
     public function testDoubleRegistrationWithException()
     {
         $val = 1;
@@ -40,6 +50,9 @@ class BaseRegistryTest extends UnitTest
         $registry->register($key, $val);
     }
 
+    /**
+     *
+     */
     public function testDoubleRegistrationWithOverwrite()
     {
         $val1 = 1;

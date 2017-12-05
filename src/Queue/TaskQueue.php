@@ -11,11 +11,20 @@ use InvalidArgumentException;
  */
 class TaskQueue
 {
+    /**
+     * @param string $queueName
+     * @param string $adapterFullyQualifiedClassName
+     * @param array  $payload
+     *
+     * @return mixed
+     * @throws InvalidArgumentException
+     */
     public static function addTaskToQueue(
         string $queueName,
         string $adapterFullyQualifiedClassName,
         array $payload = []
-    ) {
+    )
+    {
         // Validate payload
         if (array_key_exists('taskClassPath', $payload) !== true
             || array_key_exists('method', $payload) !== true

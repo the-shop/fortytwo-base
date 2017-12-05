@@ -4,9 +4,19 @@ namespace Framework\Base\Test\Dummies;
 
 use Framework\Base\Database\DatabaseQueryInterface;
 
+/**
+ * Class TestDatabaseQuery
+ * @package Framework\Base\Test\Dummies
+ */
 class TestDatabaseQuery implements DatabaseQueryInterface
 {
+    /**
+     * @var string
+     */
     private $database = '';
+    /**
+     * @var string
+     */
     private $collection = '';
 //    private $offset = '';
 //    private $limit = '';
@@ -14,21 +24,9 @@ class TestDatabaseQuery implements DatabaseQueryInterface
 //    private $conditions = [];
 
     /**
-     * @param string $name
-     *
-     * @return mixed
+     * @return string
      */
-    public function setDatabase(string $name)
-    {
-        $this->database = $name;
-
-        return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getDatabase()
+    public function getDatabase(): string
     {
         return $this->database;
     }
@@ -36,21 +34,33 @@ class TestDatabaseQuery implements DatabaseQueryInterface
     /**
      * @param string $name
      *
-     * @return mixed
+     * @return DatabaseQueryInterface
      */
-    public function setCollection(string $name)
+    public function setDatabase(string $name): DatabaseQueryInterface
     {
-        $this->collection = $name;
+        $this->database = $name;
 
         return $this;
     }
 
     /**
-     * @return mixed
+     * @return string
      */
-    public function getCollection()
+    public function getCollection(): string
     {
         return $this->collection;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return DatabaseQueryInterface
+     */
+    public function setCollection(string $name): DatabaseQueryInterface
+    {
+        $this->collection = $name;
+
+        return $this;
     }
 
     /**
@@ -64,11 +74,11 @@ class TestDatabaseQuery implements DatabaseQueryInterface
     /**
      * @param string $name
      *
-     * @return mixed
+     * @return DatabaseQueryInterface
      */
-    public function addSelectField(string $name)
+    public function addSelectField(string $name): DatabaseQueryInterface
     {
-        return 'Not implemented';
+        return $this;
     }
 
     /**
@@ -82,11 +92,11 @@ class TestDatabaseQuery implements DatabaseQueryInterface
     /**
      * @param int $limit
      *
-     * @return mixed
+     * @return DatabaseQueryInterface
      */
-    public function setLimit(int $limit)
+    public function setLimit(int $limit): DatabaseQueryInterface
     {
-        return 'Not implemented';
+        return $this;
     }
 
     /**
@@ -100,11 +110,11 @@ class TestDatabaseQuery implements DatabaseQueryInterface
     /**
      * @param int $offset
      *
-     * @return mixed
+     * @return DatabaseQueryInterface
      */
-    public function setOffset(int $offset)
+    public function setOffset(int $offset): DatabaseQueryInterface
     {
-        return 'Not implemented';
+        return $this;
     }
 
     /**
@@ -120,24 +130,32 @@ class TestDatabaseQuery implements DatabaseQueryInterface
      * @param string $condition
      * @param        $value
      *
-     * @return mixed
+     * @return DatabaseQueryInterface
      */
-    public function addAndCondition(string $field, string $condition, $value)
+    public function addAndCondition(string $field, string $condition, $value): DatabaseQueryInterface
     {
-        return 'Not implemented';
+        return $this;
     }
 
-    public function whereInArrayCondition(string $field, $value = [])
+    /**
+     * @param string $field
+     * @param array  $value
+     *
+     * @return DatabaseQueryInterface
+     */
+    public function whereInArrayCondition(string $field, $value = []): DatabaseQueryInterface
     {
-        return 'Not implemented';
+        return $this;
     }
 
     /**
      * @param string $identifier
-     * @return void
+     *
+     * @return DatabaseQueryInterface
      */
-    public function setOrderBy(string $identifier)
+    public function setOrderBy(string $identifier): DatabaseQueryInterface
     {
+        return $this;
     }
 
     /**
@@ -150,10 +168,12 @@ class TestDatabaseQuery implements DatabaseQueryInterface
 
     /**
      * @param string $orderDirection
-     * @return void
+     *
+     * @return DatabaseQueryInterface
      */
-    public function setOrderDirection(string $orderDirection)
+    public function setOrderDirection(string $orderDirection): DatabaseQueryInterface
     {
+        return $this;
     }
 
     /**

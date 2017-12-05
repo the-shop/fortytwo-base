@@ -4,8 +4,6 @@ return [
     'env' => [
         'DATABASE_NAME' => getenv('DATABASE_NAME'),
         'DATABASE_ADDRESS' => getenv('DATABASE_ADDRESS'),
-        'PRIVATE_MAIL_FROM' => getenv('PRIVATE_MAIL_FROM'),
-        'WEB_DOMAIN' => getenv('WEB_DOMAIN'),
         'SENTRY_DSN' => getenv('SENTRY_DSNSENTRY_DSN'),
         'RABBIT_MQ_HOST' => getenv('RABBIT_MQ_HOST'),
         'RABBIT_MQ_PORT' => getenv('RABBIT_MQ_PORT'),

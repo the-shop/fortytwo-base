@@ -11,11 +11,15 @@ use Framework\Base\Response\ResponseInterface;
  */
 class MemoryRenderer extends Render
 {
+    /**
+     * @var null
+     */
     private $response = null;
 
     /**
      * @param ResponseInterface $response
-     * @return mixed
+     *
+     * @return ResponseInterface
      */
     public function render(ResponseInterface $response)
     {

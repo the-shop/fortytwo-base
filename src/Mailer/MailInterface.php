@@ -89,17 +89,17 @@ interface MailInterface
     /**
      * @param array $attachments
      *
-     * @return MailerInterface
+     * @return MailInterface
      */
-    public function addAttachments(array $attachments = []);
+    public function addAttachments(array $attachments = []): MailInterface;
 
     /**
      * @param string $fileName
-     * @param $content
+     * @param        $content
      *
-     * @return MailerInterface
+     * @return MailInterface
      */
-    public function addAttachment(string $fileName, $content);
+    public function addAttachment(string $fileName, $content): MailInterface;
 
     /**
      * @return array

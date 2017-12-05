@@ -8,8 +8,16 @@ namespace Framework\Base\Logger;
  */
 class MemoryLogger implements LoggerInterface
 {
+    /**
+     * @var array
+     */
     private $logs = [];
 
+    /**
+     * @param LogInterface $log
+     *
+     * @return $this
+     */
     public function log(LogInterface $log)
     {
         $this->logs[] = $log;
@@ -17,6 +25,9 @@ class MemoryLogger implements LoggerInterface
         return $this;
     }
 
+    /**
+     * @return array
+     */
     public function getLogs()
     {
         return $this->logs;

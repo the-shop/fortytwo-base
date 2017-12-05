@@ -13,102 +13,122 @@ interface RepositoryManagerInterface
 {
     /**
      * @param string $fullyQualifiedClassName
+     *
      * @return BrunoRepositoryInterface
      */
-    public function getRepository(string $fullyQualifiedClassName = '');
+    public function getRepository(string $fullyQualifiedClassName = ''): BrunoRepositoryInterface;
 
     /**
      * @param string $resourceName
+     *
      * @return BrunoRepositoryInterface
+     * @todo change method name
      */
-    public function getRepositoryFromResourceName(string $resourceName);
+    public function getRepositoryFromResourceName(string $resourceName): BrunoRepositoryInterface;
 
     /**
      * @param string $fullyQualifiedClassName
-     * @return $this
+     *
+     * @return RepositoryManagerInterface
      */
-    public function registerRepository(string $fullyQualifiedClassName = '');
+    public function registerRepository(string $fullyQualifiedClassName = ''): RepositoryManagerInterface;
 
     /**
      * @param array $fullyQualifiedClassNames
-     * @return $this
+     *
+     * @return RepositoryManagerInterface
      */
-    public function registerRepositories(array $fullyQualifiedClassNames = []);
+    public function registerRepositories(array $fullyQualifiedClassNames = []): RepositoryManagerInterface;
 
     /**
      * @param array $resourcesMap
-     * @return $this
+     *
+     * @return RepositoryManagerInterface
+     * @todo change method name
      */
-    public function registerResources(array $resourcesMap = []);
+    public function registerResources(array $resourcesMap = []): RepositoryManagerInterface;
 
     /**
      * @param array $modelFieldsMap
-     * @return $this
+     *
+     * @return RepositoryManagerInterface
      */
-    public function registerModelFields(array $modelFieldsMap = []);
+    public function registerModelFields(array $modelFieldsMap = []): RepositoryManagerInterface;
 
     /**
      * @param string $modelName
+     *
      * @return array
      */
-    public function getRegisteredModelFields(string $modelName);
+    public function getRegisteredModelFields(string $modelName): array;
 
     /**
      * @param string $repositoryClass
-     * @return mixed
+     *
+     * @return string
      */
-    public function getModelClass(string $repositoryClass);
+    public function getModelClass(string $repositoryClass): string;
 
     /**
-     * @param string $modelClassName
+     * @param string                   $modelClassName
      * @param DatabaseAdapterInterface $adapter
-     * @return $this
+     *
+     * @return RepositoryManagerInterface
      */
-    public function addModelAdapter(string $modelClassName, DatabaseAdapterInterface $adapter);
+    public function addModelAdapter(
+        string $modelClassName,
+        DatabaseAdapterInterface $adapter
+    ): RepositoryManagerInterface;
 
     /**
      * @param string $modelClassName
-     * @return mixed
+     *
+     * @return DatabaseAdapterInterface[]
      */
-    public function getModelAdapters(string $modelClassName);
+    public function getModelAdapters(string $modelClassName): array;
 
     /**
      * @param array $modelClassNameToCollection
-     * @return $this
+     *
+     * @return RepositoryManagerInterface
      */
-    public function registerModelsToCollection(array $modelClassNameToCollection);
+    public function registerModelsToCollection(array $modelClassNameToCollection): RepositoryManagerInterface;
 
     /**
-     * @param string $modelClassName
+     * @param string                   $modelClassName
      * @param DatabaseAdapterInterface $adapter
      *
-     * @return \Framework\Base\Manager\RepositoryManagerInterface
+     * @return RepositoryManagerInterface
      */
-    public function setPrimaryAdapter(string $modelClassName, DatabaseAdapterInterface $adapter);
+    public function setPrimaryAdapter(
+        string $modelClassName,
+        DatabaseAdapterInterface $adapter
+    ): RepositoryManagerInterface;
 
     /**
      * @param string $modelClassName
-     * @return mixed
+     *
+     * @return DatabaseAdapterInterface
      */
-    public function getPrimaryAdapter(string $modelClassName);
+    public function getPrimaryAdapter(string $modelClassName): DatabaseAdapterInterface;
 
     /**
      * @param array $modelsConfigs
      *
-     * @return $this
+     * @return RepositoryManagerInterface
      */
-    public function addAuthenticatableModels(array $modelsConfigs);
+    public function addAuthenticatableModels(array $modelsConfigs): RepositoryManagerInterface;
 
     /**
      * @param string $modelName
      * @param array  $params
      *
-     * @return $this
+     * @return RepositoryManagerInterface
      */
-    public function addAuthenticatableModel(string $modelName, array $params);
+    public function addAuthenticatableModel(string $modelName, array $params): RepositoryManagerInterface;
 
     /**
      * @return array
      */
-    public function getAuthenticatableModels();
+    public function getAuthenticatableModels(): array;
 }

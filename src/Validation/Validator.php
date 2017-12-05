@@ -33,17 +33,15 @@ class Validator implements ValidatorInterface
 
     /**
      * List of values and Validations that failed
-     *
      * @var array
      */
     private $failed = [];
 
     /**
      * Translation string to fully qualified Class name
-     *
      * @var array
      */
-    private $translator = [
+    private static $translator = [
         'string' => StringValidation::class,
         'int' => IntegerValidation::class,
         'integer' => IntegerValidation::class,
@@ -61,11 +59,12 @@ class Validator implements ValidatorInterface
     ];
 
     /**
-     * @param $value
+     * @param        $value
      * @param string $rule
-     * @return $this
+     *
+     * @return ValidatorInterface
      */
-    public function addValidation($value, string $rule)
+    public function addValidation($value, string $rule): ValidatorInterface
     {
         $validation = $this->translate(strtolower($rule));
         $validationInstance = new $validation($value);
@@ -80,12 +79,29 @@ class Validator implements ValidatorInterface
     }
 
     /**
+     * Checks if selected validation rule exists
+     *
+     * @param string $type
+     *
+     * @return string
+     * @throws \InvalidArgumentException
+     */
+    protected function translate(string $type): string
+    {
+        if (isset(self::$translator[$type]) === false) {
+            throw new \InvalidArgumentException('Validation rule not supported');
+        }
+
+        return self::$translator[$type];
+    }
+
+    /**
      * Checks validity of each Validation Rule selected, throws ValidationException with all failed rules
      *
-     * @return $this
+     * @return ValidatorInterface
      * @throws ValidationException
      */
-    public function validate()
+    public function validate(): ValidatorInterface
     {
         foreach ($this->getValidations() as $validation) {
             if ($validation->isValid() === false) {
@@ -105,7 +121,7 @@ class Validator implements ValidatorInterface
     /**
      * @return ValidationInterface[]
      */
-    public function getValidations()
+    public function getValidations(): array
     {
         return $this->validations;
     }
@@ -113,45 +129,20 @@ class Validator implements ValidatorInterface
     /**
      * @return array
      */
-    public function getTranslator()
-    {
-        return $this->translator;
-    }
-
-    /**
-     * @return array
-     */
-    public function getFailed()
+    public function getFailed(): array
     {
         return $this->failed;
     }
 
     /**
      * @param ValidationInterface $validation
-     * @return $this
+     *
+     * @return ValidatorInterface
      */
-    public function setFailed(ValidationInterface $validation)
+    public function setFailed(ValidationInterface $validation): ValidatorInterface
     {
         $this->failed[$validation->getRuleName()] = $validation->getValue();
 
         return $this;
-    }
-
-    /**
-     * Checks if selected validation rule exists
-     *
-     * @param string $type
-     * @return mixed
-     * @throws \InvalidArgumentException
-     */
-    protected function translate(string $type)
-    {
-        $translator = $this->getTranslator();
-
-        if (array_key_exists($type, $translator) === false) {
-            throw new \InvalidArgumentException('Validation rule not supported');
-        }
-
-        return $translator[$type];
     }
 }

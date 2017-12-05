@@ -13,10 +13,10 @@ class TestDatabaseAdapter implements DatabaseAdapterInterface
     private $loadOneResult = null;
 
     /**
-     * @param \Framework\Base\Database\DatabaseQueryInterface $query
-     * @param array                                           $data
+     * @param DatabaseQueryInterface $query
+     * @param array                  $data
      *
-     * @return mixed
+     * @return string
      */
     public function insertOne(DatabaseQueryInterface $query, array $data = [])
     {
@@ -24,9 +24,9 @@ class TestDatabaseAdapter implements DatabaseAdapterInterface
     }
 
     /**
-     * @param \Framework\Base\Database\DatabaseQueryInterface $query
+     * @param DatabaseQueryInterface $query
      *
-     * @return mixed
+     * @return null
      */
     public function loadOne(DatabaseQueryInterface $query)
     {
@@ -41,25 +41,26 @@ class TestDatabaseAdapter implements DatabaseAdapterInterface
     public function setLoadOneResult($value)
     {
         $this->loadOneResult = $value;
+
         return $this;
     }
 
     /**
-     * @param \Framework\Base\Database\DatabaseQueryInterface $query
+     * @param DatabaseQueryInterface $query
      *
-     * @return mixed
+     * @return null
      */
     public function loadMultiple(DatabaseQueryInterface $query)
     {
-        return 'Not implemented';
+        return $this->loadOneResult;
     }
 
     /**
-     * @param \Framework\Base\Database\DatabaseQueryInterface $query
-     * @param string                                          $identifier
-     * @param array                                           $updateData
+     * @param DatabaseQueryInterface $query
+     * @param string                 $identifier
+     * @param array                  $updateData
      *
-     * @return mixed
+     * @return string
      */
     public function updateOne(DatabaseQueryInterface $query, string $identifier, array $updateData = [])
     {
@@ -67,9 +68,9 @@ class TestDatabaseAdapter implements DatabaseAdapterInterface
     }
 
     /**
-     * @param \Framework\Base\Database\DatabaseQueryInterface $query
+     * @param DatabaseQueryInterface $query
      *
-     * @return mixed
+     * @return string
      */
     public function deleteOne(DatabaseQueryInterface $query)
     {
@@ -85,25 +86,17 @@ class TestDatabaseAdapter implements DatabaseAdapterInterface
     }
 
     /**
-     * @param \Framework\Base\Database\DatabaseAdapterInterface $client
+     * @param $client
      *
-     * @return mixed
+     * @return DatabaseAdapterInterface
      */
-    public function setDatabaseAdapter(DatabaseAdapterInterface $client)
+    public function setClient($client): DatabaseAdapterInterface
     {
-        return 'Not implemented';
+        return $this;
     }
 
     /**
-     * @return mixed
-     */
-    public function getDatabaseAdapter()
-    {
-        return 'Not implemented';
-    }
-
-    /**
-     * @return \Framework\Base\Database\DatabaseQueryInterface
+     * @return DatabaseQueryInterface
      */
     public function newQuery(): DatabaseQueryInterface
     {

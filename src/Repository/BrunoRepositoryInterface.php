@@ -16,33 +16,41 @@ interface BrunoRepositoryInterface extends ApplicationAwareInterface
 {
     /**
      * @param string $collection
+     *
      * @return BrunoRepositoryInterface;
      */
-    public function setCollection(string $collection);
+    public function setCollection(string $collection): BrunoRepositoryInterface;
 
     /**
      * @return string
      */
-    public function getCollection();
+    public function getCollection(): string;
 
     /**
-     * @return DatabaseAdapterInterface|null
+     * @return DatabaseAdapterInterface[]
      */
-    public function getDatabaseAdapters();
+    public function getDatabaseAdapters(): array;
 
     /**
      * @param RepositoryManagerInterface $repositoryManager
-     * @return $this
+     *
+     * @return BrunoRepositoryInterface
      */
-    public function setRepositoryManager(RepositoryManagerInterface $repositoryManager);
+    public function setRepositoryManager(RepositoryManagerInterface $repositoryManager): BrunoRepositoryInterface;
 
     /**
-     * @return \Framework\Base\Model\BrunoInterface
+     * @return RepositoryManagerInterface
      */
-    public function newModel();
+    public function getRepositoryManager(): RepositoryManagerInterface;
+
+    /**
+     * @return BrunoInterface
+     */
+    public function newModel(): BrunoInterface;
 
     /**
      * @param $identifier
+     *
      * @return BrunoInterface|null
      */
     public function loadOne($identifier);
@@ -63,22 +71,24 @@ interface BrunoRepositoryInterface extends ApplicationAwareInterface
 
     /**
      * @param BrunoInterface $bruno
-     * @return BrunoInterface
+     *
+     * @return BrunoRepositoryInterface
      */
-    public function save(BrunoInterface $bruno);
+    public function save(BrunoInterface $bruno): BrunoRepositoryInterface;
 
     /**
      * @return DatabaseAdapterInterface
      */
-    public function getPrimaryAdapter();
+    public function getPrimaryAdapter(): DatabaseAdapterInterface;
 
     /**
      * @return string
      */
-    public function getModelPrimaryKey();
+    public function getModelPrimaryKey(): string;
 
     /**
      * @param BrunoInterface $model
+     *
      * @return DatabaseQueryInterface
      */
     public function createNewQueryForModel(BrunoInterface $model): DatabaseQueryInterface;

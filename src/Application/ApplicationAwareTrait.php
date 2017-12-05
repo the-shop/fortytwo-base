@@ -14,7 +14,16 @@ trait ApplicationAwareTrait
     private $application;
 
     /**
+     * @return ApplicationInterface
+     */
+    public function getApplication()
+    {
+        return $this->application;
+    }
+
+    /**
      * @param ApplicationInterface $application
+     *
      * @return $this
      */
     public function setApplication(ApplicationInterface $application)
@@ -22,13 +31,5 @@ trait ApplicationAwareTrait
         $this->application = $application;
 
         return $this;
-    }
-
-    /**
-     * @return ApplicationInterface
-     */
-    public function getApplication()
-    {
-        return $this->application;
     }
 }

@@ -26,6 +26,7 @@ class ExceptionHandler implements ApplicationAwareInterface
 
     /**
      * @param \Exception $e
+     *
      * @return $this
      */
     public function handle(\Exception $e)

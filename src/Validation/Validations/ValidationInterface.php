@@ -11,15 +11,16 @@ use Framework\Base\Application\ApplicationAwareInterface;
 interface ValidationInterface extends ApplicationAwareInterface
 {
     /**
-     * @return bool
-     */
-    public function isValid();
-
-    /**
      * ValidationInterface constructor. Sets value to class
+     *
      * @param $value
      */
     public function __construct($value);
+
+    /**
+     * @return bool
+     */
+    public function isValid(): bool;
 
     /**
      * @return mixed
@@ -29,5 +30,5 @@ interface ValidationInterface extends ApplicationAwareInterface
     /**
      * @return string
      */
-    public function getRuleName();
+    public function getRuleName(): string;
 }

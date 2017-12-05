@@ -55,10 +55,11 @@ class RepositoryManager implements RepositoryManagerInterface, ApplicationAwareI
      * @param string $fullyQualifiedClassName
      *
      * @return BrunoRepositoryInterface
+     * @throws \RuntimeException
      */
-    public function getRepository(string $fullyQualifiedClassName = '')
+    public function getRepository(string $fullyQualifiedClassName = ''): BrunoRepositoryInterface
     {
-        if (!class_exists($fullyQualifiedClassName)) {
+        if (class_exists($fullyQualifiedClassName) === false) {
             throw new \RuntimeException('Model ' . $fullyQualifiedClassName . ' is not registered');
         }
 
@@ -75,12 +76,14 @@ class RepositoryManager implements RepositoryManagerInterface, ApplicationAwareI
      * @param string $resourceName
      *
      * @return BrunoRepositoryInterface
+     * @throws \RuntimeException
      */
-    public function getRepositoryFromResourceName(string $resourceName)
+    public function getRepositoryFromResourceName(string $resourceName): BrunoRepositoryInterface
     {
-        if (array_key_exists($resourceName, $this->registeredResources) === false) {
-            throw new \RuntimeException('Resource "' . $resourceName
-                                        . '" not registered in Framework\Base\Manager\Repository');
+        if (isset($this->registeredResources[$resourceName]) === false) {
+            throw new \RuntimeException(
+                "Resource $resourceName not registered in Framework\Base\Manager\Repository"
+            );
         }
 
         $repositoryClass = $this->registeredResources[$resourceName];
@@ -99,7 +102,7 @@ class RepositoryManager implements RepositoryManagerInterface, ApplicationAwareI
      * @return int|null|string
      * @throws \RuntimeException
      */
-    public function getModelClass(string $repositoryClass)
+    public function getModelClass(string $repositoryClass): string
     {
         $foundClass = null;
         foreach ($this->registeredRepositories as $modelClass => $repoClass) {
@@ -110,7 +113,7 @@ class RepositoryManager implements RepositoryManagerInterface, ApplicationAwareI
         }
 
         if ($foundClass === null) {
-            throw new \RuntimeException('Model class not registered for ' . $repositoryClass);
+            throw new \RuntimeException("Model class not registered for $repositoryClass");
         }
 
         return $foundClass;
@@ -119,9 +122,9 @@ class RepositoryManager implements RepositoryManagerInterface, ApplicationAwareI
     /**
      * @param string $fullyQualifiedClassName
      *
-     * @return $this
+     * @return RepositoryManagerInterface
      */
-    public function registerRepository(string $fullyQualifiedClassName = '')
+    public function registerRepository(string $fullyQualifiedClassName = ''): RepositoryManagerInterface
     {
         /**@todo unify implementation with `registerRepositories()` */
 
@@ -133,11 +136,11 @@ class RepositoryManager implements RepositoryManagerInterface, ApplicationAwareI
     }
 
     /**
-     * @param array $fullyQualifiedClassNames modelClass => repoClass
+     * @param array $fullyQualifiedClassNames
      *
-     * @return $this
+     * @return RepositoryManagerInterface
      */
-    public function registerRepositories(array $fullyQualifiedClassNames = [])
+    public function registerRepositories(array $fullyQualifiedClassNames = []): RepositoryManagerInterface
     {
         $this->registeredRepositories = ArrayUtils::merge($this->registeredRepositories, $fullyQualifiedClassNames);
 
@@ -149,9 +152,9 @@ class RepositoryManager implements RepositoryManagerInterface, ApplicationAwareI
     /**
      * @param array $modelClassNameToCollection
      *
-     * @return $this
+     * @return RepositoryManagerInterface
      */
-    public function registerModelsToCollection(array $modelClassNameToCollection)
+    public function registerModelsToCollection(array $modelClassNameToCollection): RepositoryManagerInterface
     {
         $this->modelsToCollection = $modelClassNameToCollection;
 
@@ -161,9 +164,9 @@ class RepositoryManager implements RepositoryManagerInterface, ApplicationAwareI
     /**
      * @param array $resourcesMap
      *
-     * @return $this
+     * @return RepositoryManagerInterface
      */
-    public function registerResources(array $resourcesMap = [])
+    public function registerResources(array $resourcesMap = []): RepositoryManagerInterface
     {
         $this->registeredResources = ArrayUtils::merge($this->registeredResources, $resourcesMap);
 
@@ -180,11 +183,42 @@ class RepositoryManager implements RepositoryManagerInterface, ApplicationAwareI
     }
 
     /**
+     * @param string $modelClassName
+     *
+     * @return DatabaseAdapterInterface[]
+     * @throws \RuntimeException
+     */
+    public function getModelAdapters(string $modelClassName): array
+    {
+        if (isset($this->modelAdapters[$modelClassName]) === false) {
+            throw new \RuntimeException("No registered adapters for $modelClassName");
+        }
+
+        return $this->modelAdapters[$modelClassName];
+    }
+
+    /**
+     * @param string                   $modelClassName
+     * @param DatabaseAdapterInterface $adapter
+     *
+     * @return RepositoryManagerInterface
+     */
+    public function setPrimaryAdapter(
+        string $modelClassName,
+        DatabaseAdapterInterface $adapter
+    ): RepositoryManagerInterface
+    {
+        $this->primaryAdapters[$modelClassName] = $adapter;
+
+        return $this;
+    }
+
+    /**
      * @param array $modelFieldsMap
      *
-     * @return $this
+     * @return RepositoryManagerInterface
      */
-    public function registerModelFields(array $modelFieldsMap = [])
+    public function registerModelFields(array $modelFieldsMap = []): RepositoryManagerInterface
     {
         $this->registeredModelFields = ArrayUtils::merge($this->registeredModelFields, $modelFieldsMap);
 
@@ -199,22 +233,25 @@ class RepositoryManager implements RepositoryManagerInterface, ApplicationAwareI
      * @return array
      * @throws \RuntimeException
      */
-    public function getRegisteredModelFields(string $resourceName)
+    public function getRegisteredModelFields(string $resourceName): array
     {
         if (isset($this->registeredModelFields[$resourceName]) === false) {
-            throw new \RuntimeException('Model fields definition missing for model name: ' . $resourceName);
+            throw new \RuntimeException("Model fields definition missing for model name: $resourceName");
         }
 
         return $this->registeredModelFields[$resourceName];
     }
 
     /**
-     * @param string                                            $modelClassName
-     * @param \Framework\Base\Database\DatabaseAdapterInterface $adapter
+     * @param string                   $modelClassName
+     * @param DatabaseAdapterInterface $adapter
      *
-     * @return $this
+     * @return RepositoryManagerInterface
      */
-    public function addModelAdapter(string $modelClassName, DatabaseAdapterInterface $adapter)
+    public function addModelAdapter(
+        string $modelClassName,
+        DatabaseAdapterInterface $adapter
+    ): RepositoryManagerInterface
     {
         $this->modelAdapters[$modelClassName][] = $adapter;
 
@@ -224,38 +261,13 @@ class RepositoryManager implements RepositoryManagerInterface, ApplicationAwareI
     /**
      * @param string $modelClassName
      *
-     * @return DatabaseAdapterInterface[]
+     * @return DatabaseAdapterInterface
      * @throws \RuntimeException
      */
-    public function getModelAdapters(string $modelClassName)
-    {
-        if (isset($this->modelAdapters[$modelClassName]) === false) {
-            throw new \RuntimeException('No registered adapters for ' . $modelClassName);
-        }
-
-        return $this->modelAdapters[$modelClassName];
-    }
-
-    /**
-     * @param string $modelClassName
-     * @param DatabaseAdapterInterface $adapter
-     * @return $this
-     */
-    public function setPrimaryAdapter(string $modelClassName, DatabaseAdapterInterface $adapter)
-    {
-        $this->primaryAdapters[$modelClassName] = $adapter;
-
-        return $this;
-    }
-
-    /**
-     * @param string $modelClassName
-     * @return mixed
-     */
-    public function getPrimaryAdapter(string $modelClassName)
+    public function getPrimaryAdapter(string $modelClassName): DatabaseAdapterInterface
     {
         if (isset($this->primaryAdapters[$modelClassName]) === false) {
-            throw new \RuntimeException('No registered primary adapter for ' . $modelClassName);
+            throw new \RuntimeException("No registered primary adapter for $modelClassName");
         }
 
         return $this->primaryAdapters[$modelClassName];
@@ -264,9 +276,9 @@ class RepositoryManager implements RepositoryManagerInterface, ApplicationAwareI
     /**
      * @param array $modelsConfigs
      *
-     * @return $this
+     * @return RepositoryManagerInterface
      */
-    public function addAuthenticatableModels(array $modelsConfigs = [])
+    public function addAuthenticatableModels(array $modelsConfigs = []): RepositoryManagerInterface
     {
         foreach ($modelsConfigs as $modelName => $params) {
             $this->addAuthenticatableModel($modelName, $params);
@@ -279,9 +291,9 @@ class RepositoryManager implements RepositoryManagerInterface, ApplicationAwareI
      * @param string $modelName
      * @param array  $params
      *
-     * @return $this
+     * @return RepositoryManagerInterface
      */
-    public function addAuthenticatableModel(string $modelName, array $params = [])
+    public function addAuthenticatableModel(string $modelName, array $params = []): RepositoryManagerInterface
     {
         $this->authenticatableModels[$modelName] = $params;
 
@@ -291,7 +303,7 @@ class RepositoryManager implements RepositoryManagerInterface, ApplicationAwareI
     /**
      * @return array
      */
-    public function getAuthenticatableModels()
+    public function getAuthenticatableModels(): array
     {
         return $this->authenticatableModels;
     }

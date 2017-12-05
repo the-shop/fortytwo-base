@@ -3,6 +3,7 @@
 namespace Framework\Base\Repository;
 
 use Framework\Base\Application\ApplicationAwareTrait;
+use Framework\Base\Database\DatabaseAdapterInterface;
 use Framework\Base\Database\DatabaseQueryInterface;
 use Framework\Base\Manager\RepositoryManagerInterface;
 use Framework\Base\Model\BrunoInterface;
@@ -31,48 +32,28 @@ abstract class BrunoRepository implements BrunoRepositoryInterface
     private $modelAttributesDefinition = [];
 
     /**
-     * Sets `$collection` as the document collection
-     *
-     * @param string $collection
-     * @return $this
+     * @return DatabaseAdapterInterface[]
      */
-    public function setCollection(string $collection)
-    {
-        $this->collection = $collection;
-
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCollection()
-    {
-        return $this->collection;
-    }
-
-    /**
-     * @return \Framework\Base\Database\DatabaseAdapterInterface
-     */
-    public function getPrimaryAdapter()
-    {
-        return $this->getRepositoryManager()->getPrimaryAdapter($this->collection);
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getDatabaseAdapters()
+    public function getDatabaseAdapters(): array
     {
         return $this->getRepositoryManager()
-            ->getModelAdapters($this->collection);
+                    ->getModelAdapters($this->collection);
+    }
+
+    /**
+     * @return RepositoryManagerInterface|null
+     */
+    public function getRepositoryManager(): RepositoryManagerInterface
+    {
+        return $this->repositoryManager;
     }
 
     /**
      * @param RepositoryManagerInterface $repositoryManager
-     * @return $this
+     *
+     * @return BrunoRepositoryInterface
      */
-    public function setRepositoryManager(RepositoryManagerInterface $repositoryManager)
+    public function setRepositoryManager(RepositoryManagerInterface $repositoryManager): BrunoRepositoryInterface
     {
         $this->repositoryManager = $repositoryManager;
 
@@ -80,68 +61,8 @@ abstract class BrunoRepository implements BrunoRepositoryInterface
     }
 
     /**
-     * @return RepositoryManagerInterface|null
-     */
-    public function getRepositoryManager()
-    {
-        return $this->repositoryManager;
-    }
-
-    /**
-     * @return BrunoInterface
-     */
-    public function newModel()
-    {
-        $modelClass = $this->getModelClassName();
-
-        $modelAttributesDefinition = $this->getModelAttributesDefinition();
-
-        /* @var BrunoInterface $model */
-        $model = new $modelClass();
-
-        $config = $this->getApplication()->getConfiguration();
-
-        $model->defineModelAttributes($modelAttributesDefinition)
-            ->setPrimaryKey($this->getModelPrimaryKey())
-            ->setCollection($this->collection)
-            ->setApplication($this->getApplication())
-            ->setRepository($this)
-            ->setDatabaseAddress($config->getPathValue('env.DATABASE_ADDRESS'))
-            ->setDatabase($config->getPathValue('env.DATABASE_NAME'));
-
-        return $model;
-    }
-
-    /**
-     * @return string
-     */
-    public function getModelClassName()
-    {
-        $repositoryClass = get_class($this);
-
-        return $this->getRepositoryManager()
-            ->getModelClass($repositoryClass);
-    }
-
-    /**
-     * @return string
-     */
-    public function getModelPrimaryKey()
-    {
-        $modelAttDefinition = $this->getModelAttributesDefinition();
-
-        foreach ($modelAttDefinition as $field => $definition) {
-            if (array_key_exists('primaryKey', $definition) === true && $definition['primaryKey']
-                === true) {
-                return $field;
-            }
-        }
-
-        return null;
-    }
-
-    /**
      * @param $identifier
+     *
      * @return BrunoInterface|null
      */
     public function loadOne($identifier)
@@ -151,7 +72,11 @@ abstract class BrunoRepository implements BrunoRepositoryInterface
 
         if ($identifier instanceof DatabaseQueryInterface === false) {
             $query = $this->createNewQueryForModel($model);
-            $query->addAndCondition($model->getPrimaryKey(), '=', $identifier);
+            $query->addAndCondition(
+                $model->getPrimaryKey(),
+                '=',
+                $identifier
+            );
         } else {
             $query = $identifier;
         }
@@ -163,28 +88,138 @@ abstract class BrunoRepository implements BrunoRepositoryInterface
             return null;
         }
 
-        $model->disableFieldFilters();
-        $model->setAttributes($attributes);
-        $model->setDatabaseAttributes($attributes);
-        $model->enableFieldFilters();
-        $model->setIsNew(false);
+        $model->disableFieldFilters()
+              ->setAttributes($attributes)
+              ->setDatabaseAttributes($attributes)
+              ->enableFieldFilters()
+              ->setIsNew(false);
 
         return $model;
     }
 
     /**
-     * @param array $keyValues
-     * Example:
-     *  $keyValues = [
-     *      'name' = 'Name',
-     *      'role' = 'Role',
-     *      'xp' = [
-     *          '>',
-     *          1000,
-     *      ];
-     *  ];
+     * @return BrunoInterface
+     */
+    public function newModel(): BrunoInterface
+    {
+        $modelClass = $this->getModelClassName();
+
+        $modelAttributesDefinition = $this->getModelAttributesDefinition();
+
+        /* @var BrunoInterface $model */
+        $model = new $modelClass();
+
+        $config = $this->getApplication()
+                       ->getConfiguration();
+
+        $model->defineModelAttributes($modelAttributesDefinition)
+              ->setPrimaryKey($this->getModelPrimaryKey())
+              ->setCollection($this->collection)
+              ->setApplication($this->getApplication())
+              ->setRepository($this)
+              ->setDatabaseAddress($config->getPathValue('env.DATABASE_ADDRESS'))
+              ->setDatabase($config->getPathValue('env.DATABASE_NAME'));
+
+        return $model;
+    }
+
+    /**
+     * @return string
+     */
+    public function getModelClassName(): string
+    {
+        $repositoryClass = get_class($this);
+
+        return $this->getRepositoryManager()
+                    ->getModelClass($repositoryClass);
+    }
+
+    /**
+     * @return array
+     */
+    public function getModelAttributesDefinition(): array
+    {
+        return $this->modelAttributesDefinition;
+    }
+
+    /**
+     * @return string
+     */
+    public function getModelPrimaryKey(): string
+    {
+        $modelAttDefinition = $this->getModelAttributesDefinition();
+
+        foreach ($modelAttDefinition as $field => $definition) {
+            if (isset($definition['primaryKey']) === true
+                && $definition['primaryKey'] === true
+            ) {
+                return $field;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * @return DatabaseAdapterInterface
+     */
+    public function getPrimaryAdapter(): DatabaseAdapterInterface
+    {
+        return $this->getRepositoryManager()
+                    ->getPrimaryAdapter($this->collection);
+    }
+
+    /**
+     * @param BrunoInterface $bruno
      *
-     * @return \Framework\Base\Model\BrunoInterface|null
+     * @return DatabaseQueryInterface
+     */
+    public function createNewQueryForModel(BrunoInterface $bruno): DatabaseQueryInterface
+    {
+        $query = $this->getPrimaryAdapter()
+                      ->newQuery();
+
+        $query->setDatabase($bruno->getDatabase());
+        $query->setCollection($this->getCollection());
+
+        return $query;
+    }
+
+    /**
+     * @return string
+     */
+    public function getCollection(): string
+    {
+        return $this->collection;
+    }
+
+    /**
+     * Sets `$collection` as the document collection
+     *
+     * @param string $collection
+     *
+     * @return BrunoRepositoryInterface
+     */
+    public function setCollection(string $collection): BrunoRepositoryInterface
+    {
+        $this->collection = $collection;
+
+        return $this;
+    }
+
+    /**
+     * @param array $keyValues
+     *  Example:
+     *      $keyValues = [
+     *          'name' = 'Name',
+     *          'role' = 'Role',
+     *          'xp' = [
+     *              '>',
+     *              1000,
+     *          ];
+     *      ];
+     *
+     * @return BrunoInterface|null
      */
     public function loadOneBy(array $keyValues = [])
     {
@@ -202,7 +237,7 @@ abstract class BrunoRepository implements BrunoRepositoryInterface
         }
 
         $attributes = $this->getPrimaryAdapter()
-            ->loadOne($query);
+                           ->loadOne($query);
 
         if ($attributes === null) {
             return null;
@@ -220,7 +255,7 @@ abstract class BrunoRepository implements BrunoRepositoryInterface
     /**
      * @param $identifiers
      *
-     * @return []|BrunoInterface[]
+     * @return BrunoInterface[]
      */
     public function loadMultiple($identifiers = []): array
     {
@@ -243,10 +278,10 @@ abstract class BrunoRepository implements BrunoRepositoryInterface
         foreach ($data as $attributes) {
             $model = $this->newModel();
             $model->disableFieldFilters()
-                ->setAttributes($attributes)
-                ->setDatabaseAttributes($attributes)
-                ->enableFieldFilters()
-                ->setIsNew(false);
+                  ->setAttributes($attributes)
+                  ->setDatabaseAttributes($attributes)
+                  ->enableFieldFilters()
+                  ->setIsNew(false);
 
             $out[$model->getId()] = $model;
         }
@@ -255,38 +290,16 @@ abstract class BrunoRepository implements BrunoRepositoryInterface
     }
 
     /**
-     * @return array
-     */
-    public function getModelAttributesDefinition()
-    {
-        return $this->modelAttributesDefinition;
-    }
-
-    /**
      * @param BrunoInterface $bruno
-     * @return BrunoInterface
+     *
+     * @return BrunoRepositoryInterface
+     * @throws \RuntimeException
      */
-    public function save(BrunoInterface $bruno)
+    public function save(BrunoInterface $bruno): BrunoRepositoryInterface
     {
         // TODO: Implement save() method, let bruno use that
         throw new \RuntimeException('Not implemented');
 
         return $bruno;
-    }
-
-    /**
-     * @param BrunoInterface $bruno
-     *
-     * @return DatabaseQueryInterface
-     */
-    public function createNewQueryForModel(BrunoInterface $bruno): DatabaseQueryInterface
-    {
-        $query = $this->getPrimaryAdapter()
-            ->newQuery();
-
-        $query->setDatabase($bruno->getDatabase());
-        $query->setCollection($this->getCollection());
-
-        return $query;
     }
 }

@@ -13,7 +13,8 @@ class RabbitMQ implements QueueAdapterInterface
 {
     /**
      * @param string $queueName
-     * @param array $payload
+     * @param array  $payload
+     *
      * @return bool
      */
     public function handle(string $queueName, array $payload = [])

@@ -46,6 +46,16 @@ class Mail implements MailInterface
      */
     private $attachments = [];
 
+    /**
+     * Mail constructor.
+     *
+     * @param string $to
+     * @param string $from
+     * @param string $subject
+     * @param string $htmlBody
+     * @param string $textBody
+     * @param array  $options
+     */
     public function __construct(
         string $to = '',
         string $from = '',
@@ -53,7 +63,8 @@ class Mail implements MailInterface
         string $htmlBody = '',
         string $textBody = '',
         array $options = []
-    ) {
+    )
+    {
         $this->setTo($to)
              ->setFrom($from)
              ->setSubject($subject)
@@ -64,9 +75,17 @@ class Mail implements MailInterface
     }
 
     /**
+     * @return string
+     */
+    public function getTo(): string
+    {
+        return $this->to;
+    }
+
+    /**
      * @param string $to
      *
-     * @return \Framework\Base\Mailer\MailInterface
+     * @return MailInterface
      */
     public function setTo(string $to): MailInterface
     {
@@ -76,9 +95,17 @@ class Mail implements MailInterface
     }
 
     /**
+     * @return string
+     */
+    public function getFrom(): string
+    {
+        return $this->from;
+    }
+
+    /**
      * @param string $from
      *
-     * @return \Framework\Base\Mailer\MailInterface
+     * @return MailInterface
      */
     public function setFrom(string $from): MailInterface
     {
@@ -88,9 +115,17 @@ class Mail implements MailInterface
     }
 
     /**
+     * @return string
+     */
+    public function getSubject(): string
+    {
+        return $this->subject;
+    }
+
+    /**
      * @param string $subject
      *
-     * @return \Framework\Base\Mailer\MailInterface
+     * @return MailInterface
      */
     public function setSubject(string $subject): MailInterface
     {
@@ -100,9 +135,17 @@ class Mail implements MailInterface
     }
 
     /**
+     * @return string|null
+     */
+    public function getTextBody()
+    {
+        return $this->textBody;
+    }
+
+    /**
      * @param string $textBody
      *
-     * @return \Framework\Base\Mailer\MailInterface
+     * @return MailInterface
      */
     public function setTextBody(string $textBody): MailInterface
     {
@@ -112,9 +155,17 @@ class Mail implements MailInterface
     }
 
     /**
+     * @return string|null
+     */
+    public function getHtmlBody()
+    {
+        return $this->htmlBody;
+    }
+
+    /**
      * @param string $htmlBody
      *
-     * @return \Framework\Base\Mailer\MailInterface
+     * @return MailInterface
      */
     public function setHtmlBody(string $htmlBody): MailInterface
     {
@@ -124,11 +175,19 @@ class Mail implements MailInterface
     }
 
     /**
+     * @return array
+     */
+    public function getOptions(): array
+    {
+        return $this->options;
+    }
+
+    /**
      * CC and Bcc setter
      *
      * @param array $options
      *
-     * @return \Framework\Base\Mailer\MailInterface
+     * @return MailInterface
      * @throws \Exception
      */
     public function setOptions(array $options): MailInterface
@@ -143,54 +202,6 @@ class Mail implements MailInterface
         }
 
         return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getTo(): string
-    {
-        return $this->to;
-    }
-
-    /**
-     * @return string
-     */
-    public function getFrom(): string
-    {
-        return $this->from;
-    }
-
-    /**
-     * @return string
-     */
-    public function getSubject(): string
-    {
-        return $this->subject;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getTextBody()
-    {
-        return $this->textBody;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getHtmlBody()
-    {
-        return $this->htmlBody;
-    }
-
-    /**
-     * @return array
-     */
-    public function getOptions(): array
-    {
-        return $this->options;
     }
 
     /**
@@ -209,7 +220,7 @@ class Mail implements MailInterface
 
     /**
      * @param string $fileName
-     * @param $content
+     * @param        $content
      *
      * @return MailInterface
      */

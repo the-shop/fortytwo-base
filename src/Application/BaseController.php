@@ -11,7 +11,19 @@ abstract class BaseController implements ControllerInterface
     use ApplicationAwareTrait;
 
     /**
+     * @param $fullyQualifiedClassName
+     *
+     * @return \Framework\Base\Repository\BrunoRepositoryInterface
+     */
+    public function getRepository($fullyQualifiedClassName)
+    {
+        return $this->getRepositoryManager()
+                    ->getRepository($fullyQualifiedClassName);
+    }
+
+    /**
      * @return \Framework\Base\Manager\RepositoryManagerInterface
+     * @throws \RuntimeException
      */
     public function getRepositoryManager()
     {
@@ -23,23 +35,14 @@ abstract class BaseController implements ControllerInterface
     }
 
     /**
-     * @param $fullyQualifiedClassName
-     * @return \Framework\Base\Repository\BrunoRepositoryInterface
-     */
-    public function getRepository($fullyQualifiedClassName)
-    {
-        return $this->getRepositoryManager()
-            ->getRepository($fullyQualifiedClassName);
-    }
-
-
-    /**
      * @param string $resourceName
+     *
      * @return \Framework\Base\Repository\BrunoRepositoryInterface
+     * @todo change method name
      */
     public function getRepositoryFromResourceName(string $resourceName)
     {
         return $this->getRepositoryManager()
-            ->getRepositoryFromResourceName($resourceName);
+                    ->getRepositoryFromResourceName($resourceName);
     }
 }

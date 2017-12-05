@@ -1,8 +1,8 @@
 <?php
 
+use Framework\Base\Test\Dummies\TestDatabaseAdapter;
 use Framework\Base\Test\Dummies\TestModel;
 use Framework\Base\Test\Dummies\TestRepository;
-use Framework\Base\Test\Dummies\TestDatabaseAdapter;
 
 return [
     'php' => [

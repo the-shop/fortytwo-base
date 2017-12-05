@@ -5,12 +5,22 @@ namespace Framework\Base\Test\Logger;
 use Framework\Base\Logger\Log;
 use Framework\Base\Test\UnitTest;
 
+/**
+ * Class LogTest
+ * @package Framework\Base\Test\Logger
+ */
 class LogTest extends UnitTest
 {
+    /**
+     * @var
+     */
     private $payload;
     /** @var  Log */
     private $log;
 
+    /**
+     *
+     */
     public function setUp()
     {
         parent::setUp();
@@ -19,11 +29,17 @@ class LogTest extends UnitTest
         $this->log = new Log($this->payload);
     }
 
+    /**
+     *
+     */
     public function tearDown()
     {
         parent::tearDown();
     }
 
+    /**
+     *
+     */
     public function testIsInstantiable()
     {
         $this->assertInstanceOf(Log::class, $this->log);
@@ -31,6 +47,9 @@ class LogTest extends UnitTest
         $this->assertEquals($this->payload, $this->log->getPayload());
     }
 
+    /**
+     *
+     */
     public function testSetData()
     {
         $this->log->setData('testKey', 'testValue');
@@ -42,6 +61,9 @@ class LogTest extends UnitTest
         $this->assertEquals('testValue', $this->log->getData('testKey'));
     }
 
+    /**
+     *
+     */
     public function testIsException()
     {
         $this->assertFalse($this->log->isException());

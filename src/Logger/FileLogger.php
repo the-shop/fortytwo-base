@@ -32,8 +32,8 @@ class FileLogger implements LoggerInterface
     public function __construct()
     {
         $this->rootPath = str_replace('public', '', getcwd());
-        $this->setFileName(getenv('FILE_LOGGER_FILE_NAME'));
-        $this->setFileDirPath(getenv('FILE_LOGGER_FILE_DIR_PATH'));
+        $this->setFileName(getenv('FILE_LOGGER_FILE_NAME'))
+             ->setFileDirPath(getenv('FILE_LOGGER_FILE_DIR_PATH'));
 
         if (empty($this->getFileName()) || empty($this->getFileDirPath())) {
             throw new \RuntimeException('Filename with extension and directory path must be provided', 403);
@@ -41,7 +41,48 @@ class FileLogger implements LoggerInterface
     }
 
     /**
+     * @return array|false|string
+     */
+    public function getFileName()
+    {
+        return $this->fileName;
+    }
+
+    /**
+     * @param string $fileName
+     *
+     * @return LoggerInterface
+     */
+    public function setFileName(string $fileName): LoggerInterface
+    {
+        $this->fileName = $fileName;
+
+        return $this;
+    }
+
+    /**
+     * @return array|false|string
+     */
+    public function getFileDirPath()
+    {
+        return $this->fileDirPath;
+    }
+
+    /**
+     * @param string $fileDirPath
+     *
+     * @return LoggerInterface
+     */
+    public function setFileDirPath(string $fileDirPath): LoggerInterface
+    {
+        $this->fileDirPath = $fileDirPath;
+
+        return $this;
+    }
+
+    /**
      * @param LogInterface $log
+     *
      * @return mixed
      */
     public function log(LogInterface $log)
@@ -57,6 +98,7 @@ class FileLogger implements LoggerInterface
 
     /**
      * @param LogInterface $log
+     *
      * @return mixed
      * @throws \Exception
      */
@@ -79,7 +121,43 @@ class FileLogger implements LoggerInterface
     }
 
     /**
+     * @param string $directoryPath
+     *
+     * @return bool
+     * @throws \RuntimeException
+     */
+    private function createNewDirectory(string $directoryPath): bool
+    {
+        if (mkdir($directoryPath, 0777) === false) {
+            throw new \RuntimeException('Failed to create folder ' . $directoryPath);
+        }
+
+        return true;
+    }
+
+    /**
+     * @param $file
+     * @param $message
+     *
+     * @return bool
+     * @throws \RuntimeException
+     */
+    private function writeLogToFile($file, $message): bool
+    {
+        $logFile = fopen($file, 'a+');
+        if ($logFile === false) {
+            throw new \RuntimeException('Unable to open specified filename: ' . $file, 403);
+        }
+        $dateTime = '[' . (new \DateTime())->format('Y-m-d H:i:s') . ']';
+        fwrite($logFile, $dateTime . ' ' . $message . PHP_EOL);
+        fclose($logFile);
+
+        return true;
+    }
+
+    /**
      * @param LogInterface $log
+     *
      * @return mixed
      * @throws \Exception
      */
@@ -98,59 +176,5 @@ class FileLogger implements LoggerInterface
         $this->writeLogToFile($file, $message);
 
         return $message;
-    }
-
-    /**
-     * @param string $fileName
-     */
-    public function setFileName(string $fileName)
-    {
-        $this->fileName = $fileName;
-    }
-
-    /**
-     * @param string $fileDirPath
-     */
-    public function setFileDirPath(string $fileDirPath)
-    {
-        $this->fileDirPath = $fileDirPath;
-    }
-
-    /**
-     * @return array|false|string
-     */
-    public function getFileName()
-    {
-        return $this->fileName;
-    }
-
-    /**
-     * @return array|false|string
-     */
-    public function getFileDirPath()
-    {
-        return $this->fileDirPath;
-    }
-
-    private function createNewDirectory(string $directoryPath)
-    {
-        if (mkdir($directoryPath, 0777) === false) {
-            throw new \RuntimeException('Failed to create folder '. $directoryPath);
-        }
-
-        return true;
-    }
-
-    private function writeLogToFile($file, $message)
-    {
-        $logFile = fopen($file, 'a+');
-        if ($logFile === false) {
-            throw new \RuntimeException('Unable to open specified filename: ' . $file, 403);
-        }
-        $dateTime = '[' . (new \DateTime())->format('Y-m-d H:i:s') . ']';
-        fwrite($logFile, $dateTime . ' ' . $message . PHP_EOL);
-        fclose($logFile);
-
-        return true;
     }
 }

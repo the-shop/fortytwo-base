@@ -8,7 +8,7 @@ use Zend\Stdlib\ArrayUtils;
  * Class Configuration
  * @package Framework\Base\Application
  */
-class Configuration implements ConfigurationInterface
+abstract class Configuration implements ConfigurationInterface
 {
     /**
      * @var array
@@ -17,6 +17,7 @@ class Configuration implements ConfigurationInterface
 
     /**
      * Configuration constructor.
+     *
      * @param array $configurationValues
      */
     public function __construct(array $configurationValues = [])
@@ -25,19 +26,32 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
+     * @param int $length
+     *
      * @return string
      */
-    public function getIdentifier()
+    public static function random_string($length = 16): string
+    {
+        return shell_exec(
+            "</dev/urandom tr -dc _A-Z-a-z-0-9-'`~!@#$%^&*()_+-=,.<>?|:;[]{}/' | head -c$length; echo ''"
+        );
+    }
+
+    /**
+     * @return string
+     */
+    public function getIdentifier(): string
     {
         return self::class;
     }
 
     /**
      * @param string $dotPath
-     * @param $value
-     * @return $this
+     * @param        $value
+     *
+     * @return ConfigurationInterface
      */
-    public function setPathValue(string $dotPath, $value)
+    public function setPathValue(string $dotPath, $value): ConfigurationInterface
     {
         $arrayPath = explode('.', $dotPath);
 
@@ -47,70 +61,10 @@ class Configuration implements ConfigurationInterface
     }
 
     /**
-     * @param string $dotPath
-     * @return mixed
-     */
-    public function getPathValue(string $dotPath)
-    {
-        $arrayPath = explode('.', $dotPath);
-
-        return $this->arrayPath($arrayPath, $this->configuration);
-    }
-
-    /**
-     * @return array
-     */
-    public function getAll(): array
-    {
-        return $this->configuration;
-    }
-
-    /**
-     * @param string $path
-     * @return \Framework\Base\Application\ConfigurationInterface
-     * @todo discuss renaming to loadFromPhp
-     */
-    public function readFromPhp(string $path): ConfigurationInterface
-    {
-        if (is_file($path) === false) {
-            throw new \RuntimeException(
-                'Unable to open php file' . $path . ' file not found!',
-                404
-            );
-        }
-
-        $config = include $path;
-
-        $this->configuration = ArrayUtils::merge($this->configuration, $config);
-
-        return $this;
-    }
-
-    /**
-     * @param string $path
-     * @return \Framework\Base\Application\ConfigurationInterface
-     * @todo discuss renaming to loadFromJson
-     */
-    public function readFromJson(string $path): ConfigurationInterface
-    {
-        if (is_file($path) === false) {
-            throw new \RuntimeException(
-                'Unable to open json file' . $path . ' file not found!',
-                404
-            );
-        }
-
-        $config = json_decode(file_get_contents($path), true);
-
-        $this->configuration = ArrayUtils::merge($this->configuration, $config);
-
-        return $this;
-    }
-
-    /**
-     * @param $array
+     * @param       $array
      * @param array $pathParts
-     * @param null $value
+     * @param null  $value
+     *
      * @return mixed
      */
     private function arrayPath(array $pathParts, &$array, &$value = null)
@@ -135,10 +89,69 @@ class Configuration implements ConfigurationInterface
         return $prev;
     }
 
-    public static function random_string($length = 16)
+    /**
+     * @param string $dotPath
+     *
+     * @return mixed
+     */
+    public function getPathValue(string $dotPath)
     {
-        return shell_exec(
-            "</dev/urandom tr -dc _A-Z-a-z-0-9-'`~!@#$%^&*()_+-=,.<>?|:;[]{}/' | head -c$length; echo ''"
-        );
+        $arrayPath = explode('.', $dotPath);
+
+        return $this->arrayPath($arrayPath, $this->configuration);
+    }
+
+    /**
+     * @return array
+     */
+    public function getAll(): array
+    {
+        return $this->configuration;
+    }
+
+    /**
+     * @param string $path
+     *
+     * @return ConfigurationInterface
+     * @throws \RuntimeException
+     * @todo discuss renaming to loadFromPhp
+     */
+    public function readFromPhp(string $path): ConfigurationInterface
+    {
+        if (is_file($path) === false) {
+            throw new \RuntimeException(
+                'Unable to open php file' . $path . ' file not found!',
+                404
+            );
+        }
+
+        $config = include $path;
+
+        $this->configuration = ArrayUtils::merge($this->configuration, $config);
+
+        return $this;
+    }
+
+    /**
+     * @param string $path
+     *
+     * @return ConfigurationInterface
+     * @throws \RuntimeException
+     * @todo discuss renaming to loadFromJson
+     */
+    public function readFromJson(string $path): ConfigurationInterface
+    {
+        if (is_file($path) === false) {
+            throw new \RuntimeException(
+                'Unable to open json file' . $path . ' file not found!',
+                404
+            );
+        }
+
+        $config = json_decode(file_get_contents($path), true);
+
+        $this->configuration = ArrayUtils::merge($this->configuration, $config);
+
+        return $this;
     }
 }

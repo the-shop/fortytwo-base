@@ -1,17 +1,23 @@
 <?php
 
-namespace Framework\Base\Application;
+namespace Framework\Base\Service;
+
+use Framework\Base\Application\ApplicationAwareTrait;
+use Framework\Base\Application\BaseRegistry;
+use Framework\Base\Application\RegistryInterface;
 
 /**
  * Class ServicesRegistry
- * @package Framework\Base\Application
+ * @package Framework\Base\Service
  */
 class ServicesRegistry extends BaseRegistry
 {
     use ApplicationAwareTrait;
+
     /**
      * @param ServiceInterface $service
-     * @param bool $overwrite
+     * @param bool             $overwrite
+     *
      * @return $this
      */
     public function registerService(ServiceInterface $service, bool $overwrite = false)
@@ -23,14 +29,14 @@ class ServicesRegistry extends BaseRegistry
     }
 
     /**
-     * Same functionality as in BaseRegistry but does validation of $value's interface
-     *
      * @param string $key
-     * @param $value
-     * @param bool $overwrite
-     * @return BaseRegistry
+     * @param        $value
+     * @param bool   $overwrite
+     *
+     * @return RegistryInterface
+     * @throws \RuntimeException
      */
-    public function register(string $key, $value, bool $overwrite = false)
+    public function register(string $key, $value, bool $overwrite = false): RegistryInterface
     {
         if ($value instanceof ServiceInterface) {
             return parent::register($key, $value, $overwrite);

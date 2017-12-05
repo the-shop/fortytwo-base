@@ -10,9 +10,10 @@ class AlphaDashValidation extends Validation
 {
     /**
      * Validate that an attribute contains only alpha-numeric characters, dashes, and underscores.
+     *
      * @return bool
      */
-    public function isValid()
+    public function isValid(): bool
     {
         if (empty($this->getValue()) === true) {
             return true;
@@ -24,7 +25,7 @@ class AlphaDashValidation extends Validation
     /**
      * @return string
      */
-    public function getRuleName()
+    public function getRuleName(): string
     {
         return 'isAlphaDashed';
     }

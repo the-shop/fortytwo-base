@@ -11,7 +11,7 @@ class AlphabeticValidation extends Validation
     /**
      * @return bool
      */
-    public function isValid()
+    public function isValid(): bool
     {
         return ctype_alpha($this->getValue()) === true;
     }
@@ -19,7 +19,7 @@ class AlphabeticValidation extends Validation
     /**
      * @return string
      */
-    public function getRuleName()
+    public function getRuleName(): string
     {
         return 'isAlphabetic';
     }

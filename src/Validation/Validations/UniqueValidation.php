@@ -10,8 +10,9 @@ class UniqueValidation extends Validation
 {
     /**
      * @return bool
+     * @throws \InvalidArgumentException
      */
-    public function isValid()
+    public function isValid(): bool
     {
         $value = $this->getValue();
 
@@ -31,9 +32,9 @@ class UniqueValidation extends Validation
 
 
         $model = $this->getApplication()
-            ->getRepositoryManager()
-            ->getRepositoryFromResourceName($value['resourceName'])
-            ->loadOneBy([$identifier => $identifierValue]);
+                      ->getRepositoryManager()
+                      ->getRepositoryFromResourceName($value['resourceName'])
+                      ->loadOneBy([$identifier => $identifierValue]);
 
         if ($model) {
             return false;
@@ -45,7 +46,7 @@ class UniqueValidation extends Validation
     /**
      * @return string
      */
-    public function getRuleName()
+    public function getRuleName(): string
     {
         return 'isUnique';
     }

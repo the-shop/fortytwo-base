@@ -22,8 +22,8 @@ class BrunoTest extends UnitTest
         $repositoryManager = $this->getApplication()
                                   ->getRepositoryManager();
 
-        $appConfig->readFromJson(dirname(__DIR__) . '/Dummies/dummyConfigJson.json');
-        $appConfig->readFromPhp(dirname(__DIR__) . '/Dummies/dummyConfig.php');
+        $appConfig->readFromJson(dirname(__DIR__) . '/Dummies/dummyConfigJson.json')
+                  ->readFromPhp(dirname(__DIR__) . '/Dummies/dummyConfig.php');
 
         // Format models configuration
         $modelsConfiguration = $this->generateModelsConfiguration(
@@ -32,16 +32,16 @@ class BrunoTest extends UnitTest
 
         $modelAdapters = $appConfig->getPathValue('modelAdapters');
         // Register model adapters
-        foreach ($modelAdapters as $model => $adapters) {
+        foreach ($modelAdapters as $collection => $adapters) {
             foreach ($adapters as $adapter) {
-                $repositoryManager->addModelAdapter($model, new $adapter());
+                $repositoryManager->addModelAdapter($collection, new $adapter());
             }
         }
 
         $primaryModelAdapter = $appConfig->getPathValue('primaryModelAdapter');
         // Register model primary adapters
-        foreach ($primaryModelAdapter as $model => $primaryAdapter) {
-            $repositoryManager->setPrimaryAdapter($model, new $primaryAdapter());
+        foreach ($primaryModelAdapter as $collection => $primaryAdapter) {
+            $repositoryManager->setPrimaryAdapter($collection, new $primaryAdapter());
         }
 
         // Register resources, repositories and model fields
@@ -53,11 +53,12 @@ class BrunoTest extends UnitTest
                                    ->newModel()
                                    ->addFieldFilter('name', new LowerCaseFilter())
                                    ->addFieldFilter('email', new TrimFilter())
-                                   ->setAttributes([
-                                       'name' => 'TESTING',
-                                       'email' => ' test@test.com ',
-                                       'password' => 'test password',
-                                                   ]
+                                   ->setAttributes(
+                                       [
+                                           'name' => 'TESTING',
+                                           'email' => ' test@test.com ',
+                                           'password' => 'test password',
+                                       ]
                                    );
 
         $attributes = $model->getAttributes();

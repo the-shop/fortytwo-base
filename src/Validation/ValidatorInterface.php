@@ -2,6 +2,8 @@
 
 namespace Framework\Base\Validation;
 
+use Framework\Base\Validation\Validations\ValidationInterface;
+
 /**
  * Interface ValidatorInterface
  * @package Framework\Base\Validation
@@ -9,25 +11,32 @@ namespace Framework\Base\Validation;
 interface ValidatorInterface
 {
     /**
-     * @param $value
+     * @param        $value
      * @param string $rule
-     * @return mixed
+     *
+     * @return ValidatorInterface
      */
-    public function addValidation($value, string $rule);
+    public function addValidation($value, string $rule): ValidatorInterface;
 
     /**
-     * @return $this
-     * @throws \Framework\Base\Application\Exception\ValidationException
+     * @return ValidatorInterface
      */
-    public function validate();
+    public function validate(): ValidatorInterface;
 
     /**
-     * @return \Framework\Base\Validation\Validations\ValidationInterface[]
+     * @return ValidationInterface[]
      */
-    public function getValidations();
+    public function getValidations(): array;
 
     /**
      * @return array
      */
-    public function getFailed();
+    public function getFailed(): array;
+
+    /**
+     * @param ValidationInterface $validation
+     *
+     * @return ValidatorInterface
+     */
+    public function setFailed(ValidationInterface $validation): ValidatorInterface;
 }

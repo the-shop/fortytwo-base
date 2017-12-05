@@ -6,45 +6,30 @@ namespace Framework\Base\Application;
  * Class ApplicationConfiguration
  * @package Framework\Base\Application
  */
-class ApplicationConfiguration extends Configuration
+class ApplicationConfiguration extends Configuration implements ApplicationConfigurationInterface
 {
     /**
      * @var array
      */
     private $registeredModules = [];
 
-    public function __construct(array $configurationValues = [])
-    {
-        parent::__construct($configurationValues);
-
-        $this->setRootPath();
-    }
-
-    /**
-     * @param array $modules
-     */
-    public function setRegisteredModules(array $modules)
-    {
-        $this->registeredModules = $modules;
-    }
-
     /**
      * @return array
      */
-    public function getRegisteredModules()
+    public function getRegisteredModules(): array
     {
         return $this->registeredModules;
     }
 
-    public function setRootPath(): ConfigurationInterface
+    /**
+     * @param array $modules
+     *
+     * @return ApplicationConfigurationInterface
+     */
+    public function setRegisteredModules(array $modules): ApplicationConfigurationInterface
     {
-        $this->setPathValue('rootPath', realpath(dirname(__FILE__, 6)));
+        $this->registeredModules = $modules;
 
         return $this;
-    }
-
-    public function getRootPath()
-    {
-        return $this->getPathValue('rootPath');
     }
 }

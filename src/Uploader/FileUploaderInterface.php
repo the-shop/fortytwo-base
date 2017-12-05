@@ -28,7 +28,7 @@ interface FileUploaderInterface extends ApplicationAwareInterface
     /**
      * @param $client
      *
-     * @return \Framework\Base\Uploader\FileUploaderInterface
+     * @return FileUploaderInterface
      */
     public function setClient($client): FileUploaderInterface;
 

@@ -11,7 +11,7 @@ interface ResponseInterface
     /**
      * @param $responseBody
      *
-     * @return \Framework\Base\Response\ResponseInterface
+     * @return ResponseInterface
      */
     public function setBody($responseBody): ResponseInterface;
 
@@ -23,7 +23,7 @@ interface ResponseInterface
     /**
      * @param int $code
      *
-     * @return \Framework\Base\Response\ResponseInterface
+     * @return ResponseInterface
      */
     public function setCode(int $code): ResponseInterface;
 

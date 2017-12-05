@@ -15,6 +15,7 @@ class TestListener implements ListenerInterface
 
     /**
      * @param $payload
+     *
      * @return mixed
      */
     public function handle($payload)

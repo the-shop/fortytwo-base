@@ -9,22 +9,25 @@ namespace Framework\Base\Application;
 interface RegistryInterface extends ApplicationAwareInterface
 {
     /**
-     * @param $key
-     * @param $value
-     * @param bool $overwrite
-     * @return mixed
+     * @param string $key
+     * @param        $value
+     * @param bool   $overwrite
+     *
+     * @return RegistryInterface
      */
-    public function register(string $key, $value, bool $overwrite = false);
+    public function register(string $key, $value, bool $overwrite = false): RegistryInterface;
 
     /**
      * @param string $key
+     *
      * @return mixed
      */
     public function get(string $key);
 
     /**
      * @param string $key
-     * @return mixed
+     *
+     * @return RegistryInterface
      */
-    public function delete(string $key);
+    public function delete(string $key): RegistryInterface;
 }

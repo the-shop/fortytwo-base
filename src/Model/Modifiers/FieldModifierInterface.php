@@ -10,6 +10,7 @@ interface FieldModifierInterface
 {
     /**
      * @param $value
+     *
      * @return mixed
      */
     public function modify($value);

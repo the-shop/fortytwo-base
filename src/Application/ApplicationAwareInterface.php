@@ -10,12 +10,13 @@ interface ApplicationAwareInterface
 {
     /**
      * @param ApplicationInterface $application
+     *
      * @return mixed
      */
     public function setApplication(ApplicationInterface $application);
 
     /**
-     * @return mixed
+     * @return ApplicationInterface
      */
     public function getApplication();
 }

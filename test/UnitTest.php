@@ -2,8 +2,8 @@
 
 namespace Framework\Base\Test;
 
-use Framework\Base\Application\ApplicationInterface;
 use Framework\Base\Application\ApplicationConfiguration;
+use Framework\Base\Application\ApplicationInterface;
 use Framework\Base\Request\RequestInterface;
 use Framework\Base\Test\Dummies\DummyApplication;
 use Framework\Base\Test\Dummies\MemoryRenderer;
@@ -12,7 +12,6 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * All tests should extend this class
- *
  * Class UnitTest
  * @package Framework\Base\Test
  */
@@ -36,7 +35,15 @@ class UnitTest extends TestCase
 
         $appConfig = new ApplicationConfiguration();
 
-        $this->application = new DummyApplication($appConfig);
+        $this->setApplication(new DummyApplication($appConfig));
+    }
+
+    /**
+     *
+     */
+    public function testIgnore()
+    {
+        $this->assertEquals(true, true);
     }
 
     /**
@@ -75,7 +82,20 @@ class UnitTest extends TestCase
     }
 
     /**
+     * @param \Framework\Base\Application\ApplicationInterface $app
+     *
+     * @return $this
+     */
+    protected function setApplication(ApplicationInterface $app)
+    {
+        $this->application = $app;
+
+        return $this;
+    }
+
+    /**
      * @param $modelsConfig
+     *
      * @return array
      */
     protected function generateModelsConfiguration(array $modelsConfig)
@@ -90,10 +110,5 @@ class UnitTest extends TestCase
         }
 
         return $generatedConfiguration;
-    }
-
-    public function testIgnore()
-    {
-        $this->assertEquals(true, true);
     }
 }

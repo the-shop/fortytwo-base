@@ -28,9 +28,10 @@ abstract class BaseModule implements ModuleInterface
 
     /**
      * @param string $configDirPath Full path to module config directory
-     * @return $this
+     *
+     * @return ModuleInterface
      */
-    public function setModuleConfiguration(string $configDirPath)
+    public function setModuleConfiguration(string $configDirPath): ModuleInterface
     {
         $configFiles = $this->getDirContents($configDirPath);
 
@@ -50,10 +51,12 @@ abstract class BaseModule implements ModuleInterface
 
     /**
      * Get directory contents, return array of file paths
+     *
      * @param string $path Full path to directory
+     *
      * @return array
      */
-    private function getDirContents(string $path)
+    private function getDirContents(string $path): array
     {
         $rii = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path));
 
