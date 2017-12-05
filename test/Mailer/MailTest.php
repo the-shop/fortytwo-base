@@ -26,7 +26,7 @@ class MailTest extends UnitTest
                  [
                      'cc' => 'test cc'
                  ]
-            );
+             );
 
         $this::assertEquals('<h1>Test</h1>', $mail->getHtmlBody());
         $this::assertEquals('Test', $mail->getTextBody());

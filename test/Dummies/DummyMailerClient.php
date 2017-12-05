@@ -15,7 +15,8 @@ class DummyMailerClient
      * @param $textBody
      * @param $htmlBody
      *
-     * @return string
+     * @return mixed
+     * @throws \RuntimeException
      */
     public function send($to, $from, $subject, $textBody, $htmlBody)
     {

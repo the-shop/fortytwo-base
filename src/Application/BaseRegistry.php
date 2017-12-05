@@ -16,14 +16,16 @@ class BaseRegistry implements RegistryInterface
     private $content = [];
 
     /**
-     * @param $key
-     * @param $value
-     * @param bool $overwrite
-     * @return $this
+     * @param string $key
+     * @param        $value
+     * @param bool   $overwrite
+     *
+     * @return RegistryInterface
+     * @throws \RuntimeException
      */
-    public function register(string $key, $value, bool $overwrite = false)
+    public function register(string $key, $value, bool $overwrite = false): RegistryInterface
     {
-        if (array_key_exists($key, $this->content) === true && $overwrite === false) {
+        if (isset($this->content[$key]) === true && $overwrite === false) {
             throw new \RuntimeException('Key "' . $key . '" is already registered.');
         }
 
@@ -34,11 +36,13 @@ class BaseRegistry implements RegistryInterface
 
     /**
      * @param string $key
+     *
      * @return mixed
+     * @throws \RuntimeException
      */
     public function get(string $key)
     {
-        if (array_key_exists($key, $this->content) === false) {
+        if (isset($this->content[$key]) === false) {
             throw new \RuntimeException('Key "' . $key . '" is not registered.');
         }
 
@@ -47,11 +51,12 @@ class BaseRegistry implements RegistryInterface
 
     /**
      * @param string $key
-     * @return $this
+     *
+     * @return RegistryInterface
      */
-    public function delete(string $key)
+    public function delete(string $key): RegistryInterface
     {
-        if (array_key_exists($key, $this->content) === true) {
+        if (isset($this->content[$key]) === true) {
             unset($this->content[$key]);
         }
 

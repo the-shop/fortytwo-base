@@ -3,8 +3,8 @@
 namespace Framework\Base\Application;
 
 use Framework\Base\Application\Exception\ExceptionHandler;
-use Framework\Base\Application\Exception\MethodNotAllowedException;
 use Framework\Base\Application\Exception\GuzzleHttpException;
+use Framework\Base\Application\Exception\MethodNotAllowedException;
 use Framework\Base\Event\ListenerInterface;
 use Framework\Base\Logger\LoggerInterface;
 use Framework\Base\Logger\LogInterface;
@@ -15,6 +15,8 @@ use Framework\Base\Render\RenderInterface;
 use Framework\Base\Request\RequestInterface;
 use Framework\Base\Response\ResponseInterface;
 use Framework\Base\Router\DispatcherInterface;
+use Framework\Base\Service\ServiceInterface;
+use Framework\Base\Service\ServicesRegistry;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 
@@ -112,7 +114,7 @@ abstract class BaseApplication implements ApplicationInterface, ApplicationAware
     private $loggers = [];
 
     /**
-     * @var ServicesRegistry|null
+     * @var \Framework\Base\Service\ServicesRegistry|null
      */
     private $servicesRegistry = null;
 
@@ -123,16 +125,16 @@ abstract class BaseApplication implements ApplicationInterface, ApplicationAware
 
     /**
      * Has to build instance of RequestInterface, set it to BaseApplication and return it
-     *
      * @return RequestInterface
      */
     abstract public function buildRequest();
 
     /**
      * BaseApplication constructor.
-     * @param ApplicationConfiguration|null $applicationConfiguration
+     *
+     * @param ApplicationConfigurationInterface|null $applicationConfiguration
      */
-    public function __construct(ApplicationConfiguration $applicationConfiguration = null)
+    public function __construct(ApplicationConfigurationInterface $applicationConfiguration = null)
     {
         if ($applicationConfiguration === null) {
             $applicationConfiguration = new ApplicationConfiguration();
@@ -140,46 +142,16 @@ abstract class BaseApplication implements ApplicationInterface, ApplicationAware
 
         $this->configuration = $applicationConfiguration;
 
-        $this->setExceptionHandler(new ExceptionHandler());
-        $this->bootstrap();
-    }
-
-    /**
-     * @param string $serviceClass
-     * @return ServiceInterface
-     */
-    public function getService(string $serviceClass)
-    {
-        return $this->servicesRegistry->get($serviceClass);
-    }
-
-    /**
-     * @param \Framework\Base\Application\ServiceInterface $service
-     * @param bool                                         $overwriteExisting
-     *
-     * @return \Framework\Base\Application\ApplicationInterface
-     */
-    public function registerService(ServiceInterface $service, bool $overwriteExisting = false): ApplicationInterface
-    {
-        $this->servicesRegistry->registerService($service, $overwriteExisting);
-
-        return $this;
-    }
-
-    /**
-     * @return ApplicationConfiguration
-     */
-    public function getConfiguration()
-    {
-        return $this->configuration;
+        $this->setRootPath()
+             ->setExceptionHandler(new ExceptionHandler())
+             ->bootstrap();
     }
 
     /**
      * Main application entry point
-     *
-     * @return $this
+     * @return ApplicationInterface
      */
-    public function run()
+    public function run(): ApplicationInterface
     {
         try {
             $this->triggerEvent(self::EVENT_APPLICATION_BUILD_REQUEST_PRE);
@@ -196,31 +168,34 @@ abstract class BaseApplication implements ApplicationInterface, ApplicationAware
 
             $this->triggerEvent(self::EVENT_APPLICATION_RENDER_RESPONSE_PRE);
             $this->getRenderer()
-                ->render($response);
+                 ->render($response);
             $this->triggerEvent(self::EVENT_APPLICATION_RENDER_RESPONSE_POST);
         } catch (\Exception $e) {
             $this->getExceptionHandler()
-                ->handle($e);
+                 ->handle($e);
 
             $this->getRenderer()
-                ->render($this->getResponse());
+                 ->render($this->getResponse());
         }
 
         return $this;
     }
 
     /**
-     * @param RequestInterface $request
-     * @return $this
+     * @return Bootstrap
      */
-    public function parseRequest(RequestInterface $request)
+    public function bootstrap(): Bootstrap
     {
-        $dispatcher = $this->getDispatcher();
-        $dispatcher->setApplication($this);
-        $dispatcher->register();
-        $dispatcher->parseRequest($request);
+        $this->servicesRegistry = new ServicesRegistry();
+        $this->servicesRegistry->setApplication($this);
 
-        return $this;
+        $bootstrap = new Bootstrap();
+        $registerModules = $this->getConfiguration()
+                                ->getRegisteredModules();
+
+        $bootstrap->registerModules($registerModules, $this);
+
+        return $bootstrap;
     }
 
     /**
@@ -241,7 +216,10 @@ abstract class BaseApplication implements ApplicationInterface, ApplicationAware
         $this->setController($controller);
         $controller->setApplication($this);
 
-        $parameterValues = array_values($this->getDispatcher()->getRouteParameters());
+        $parameterValues = array_values(
+            $this->getDispatcher()
+                 ->getRouteParameters()
+        );
 
         $handlerOutput = $controller->{$action}(...$parameterValues);
 
@@ -252,276 +230,51 @@ abstract class BaseApplication implements ApplicationInterface, ApplicationAware
     }
 
     /**
-     * @return Bootstrap
+     * @param RequestInterface $request
+     *
+     * @return ApplicationInterface
      */
-    public function bootstrap()
+    public function parseRequest(RequestInterface $request): ApplicationInterface
     {
-        $this->servicesRegistry = new ServicesRegistry();
-        $this->servicesRegistry->setApplication($this);
+        $dispatcher = $this->getDispatcher();
+        $dispatcher->setApplication($this);
+        $dispatcher->register();
+        $dispatcher->parseRequest($request);
 
-        $bootstrap = new Bootstrap();
-        $registerModules = $this->getConfiguration()->getRegisteredModules();
-        $bootstrap->registerModules($registerModules, $this);
-
-        return $bootstrap;
+        return $this;
     }
 
     /**
      * @param string $eventName
-     * @param null $payload
+     * @param null   $payload
+     *
      * @return array
+     * @throws \RuntimeException
      */
-    public function triggerEvent(string $eventName, $payload = null)
+    public function triggerEvent(string $eventName, $payload = null): array
     {
         $responses = [];
-        if (array_key_exists($eventName, $this->events) === true) {
+        if (isset($this->events[$eventName]) === true) {
             foreach ($this->events[$eventName] as $listenerClass) {
+                /**
+                 * @var ListenerInterface $listener
+                 */
                 $listener = new $listenerClass();
-                if (!($listener instanceof ListenerInterface)) {
+                if (($listener instanceof ListenerInterface) === false) {
                     throw new \RuntimeException('Listeners "' . $listenerClass . '" must implement ListenerInterface.');
                 }
                 $listener->setApplication($this);
                 $responses[] = $listener->handle($payload);
             }
         }
+
         return $responses;
     }
 
     /**
-     * @param string $eventName
-     * @param string $listenerClass
-     * @return $this
-     */
-    public function listen(string $eventName, string $listenerClass)
-    {
-        if (array_key_exists($eventName, $this->events) === false) {
-            $this->events[$eventName] = [];
-        }
-
-        $this->events[$eventName][] = $listenerClass;
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function removeAllEventListeners()
-    {
-        $this->events = [];
-
-        return $this;
-    }
-
-    /**
-     * @param string $eventName
-     * @return $this
-     */
-    public function removeEventListeners(string $eventName)
-    {
-        if (isset($this->events[$eventName]) === true) {
-            unset($this->events[$eventName]);
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getEvents(): array
-    {
-        return $this->events;
-    }
-
-    /**
-     * @param ExceptionHandler $exceptionHandler
-     * @return $this
-     */
-    public function setExceptionHandler(ExceptionHandler $exceptionHandler)
-    {
-        $this->exceptionHandler = $exceptionHandler;
-
-        $this->exceptionHandler->setApplication($this);
-
-        return $this;
-    }
-
-    /**
-     * @return ExceptionHandler|null
-     */
-    public function getExceptionHandler()
-    {
-        return $this->exceptionHandler;
-    }
-
-    /**
-     * @param RenderInterface $render
-     * @return $this
-     */
-    public function setRenderer(RenderInterface $render)
-    {
-        $this->renderer = $render;
-
-        return $this;
-    }
-
-    /**
-     * @return RenderInterface
-     */
-    public function getRenderer()
-    {
-        return $this->renderer;
-    }
-
-    /**
-     * @param \Framework\Base\Manager\RepositoryManagerInterface $repositoryManager
-     * @return $this
-     */
-    public function setRepositoryManager(RepositoryManagerInterface $repositoryManager)
-    {
-        $this->repositoryManager = $repositoryManager;
-
-        return $this;
-    }
-
-    /**
-     * @return \Framework\Base\Manager\RepositoryManagerInterface|null
-     */
-    public function getRepositoryManager()
-    {
-        if ($this->repositoryManager === null) {
-            $repository = new RepositoryManager();
-            $repository->setApplication($this);
-            $this->setRepositoryManager($repository);
-        }
-
-        return $this->repositoryManager;
-    }
-
-    /**
-     * @return \Framework\Base\Router\DispatcherInterface
-     */
-    public function getDispatcher()
-    {
-        if ($this->dispatcher === null) {
-            throw new \RuntimeException('Dispatcher object not set.');
-        }
-        return $this->dispatcher;
-    }
-
-    /**
-     * @param DispatcherInterface $dispatcher
-     * @return $this
-     */
-    public function setDispatcher(DispatcherInterface $dispatcher)
-    {
-        $this->dispatcher = $dispatcher;
-
-        return $this;
-    }
-
-    /**
-     * @return RequestInterface
-     */
-    public function getRequest()
-    {
-        if ($this->request === null) {
-            $this->buildRequest();
-        }
-        return $this->request;
-    }
-
-    /**
-     * @param RequestInterface $request
-     * @return $this
-     */
-    public function setRequest(RequestInterface $request)
-    {
-        $this->request = $request;
-
-        return $this;
-    }
-
-    /**
-     * @param ResponseInterface $response
-     * @return $this
-     */
-    public function setResponse(ResponseInterface $response)
-    {
-        $this->response = $response;
-
-        return $this;
-    }
-
-    /**
-     * @return ResponseInterface
-     */
-    public function getResponse()
-    {
-        return $this->response;
-    }
-
-    /**
-     * @param ControllerInterface $controller
-     * @return $this
-     */
-    public function setController(ControllerInterface $controller)
-    {
-        $this->controller = $controller;
-
-        return $this;
-    }
-
-    /**
-     * @return ControllerInterface|null
-     */
-    public function getController()
-    {
-        return $this->controller;
-    }
-
-    /**
-     * @param LogInterface $log
-     *
-     * @return \Framework\Base\Application\ApplicationInterface
-     * @throws \RuntimeException
-     */
-    public function log(LogInterface $log): ApplicationInterface
-    {
-        if (count($this->getLoggers()) === 0) {
-            $this->addLogger(new MemoryLogger());
-        }
-        foreach ($this->getLoggers() as $logger) {
-            $logger->log($log);
-        }
-        return $this;
-    }
-
-    /**
-     * @param LoggerInterface $logger
-     *
-     * @return \Framework\Base\Application\ApplicationInterface
-     */
-    public function addLogger(LoggerInterface $logger): ApplicationInterface
-    {
-        $this->loggers[] = $logger;
-
-        return $this;
-    }
-
-    /**
-     * @return LoggerInterface[]
-     */
-    public function getLoggers()
-    {
-        return $this->loggers;
-    }
-
-    /**
-     * @param string    $method
-     * @param string    $uri
-     * @param array     $params
+     * @param string $method
+     * @param string $uri
+     * @param array  $params
      *
      * @return mixed|\Psr\Http\Message\ResponseInterface
      * @throws GuzzleHttpException
@@ -556,16 +309,315 @@ abstract class BaseApplication implements ApplicationInterface, ApplicationAware
                 $message = $requestException->getMessage();
                 $code = null;
             } else {
-                $message = $requestException->getResponse()->getReasonPhrase();
-                $code = $requestException->getResponse()->getStatusCode();
+                $message = $requestException->getResponse()
+                                            ->getReasonPhrase();
+
+                $code = $requestException->getResponse()
+                                         ->getStatusCode();
             }
             throw new GuzzleHttpException($message, $code);
         }
 
-        $response = $this->getResponse();
-        $response->setCode($guzzleHttpResponse->getStatusCode());
-        $response->setBody($guzzleHttpResponse->getBody());
+        $response = $this->getResponse()
+                         ->setCode($guzzleHttpResponse->getStatusCode())
+                         ->setBody($guzzleHttpResponse->getBody());
 
         return $response;
+    }
+
+    /**
+     * @param string $eventName
+     * @param string $listenerClass
+     *
+     * @return ApplicationInterface
+     */
+    public function listen(string $eventName, string $listenerClass): ApplicationInterface
+    {
+        if (isset($this->events[$eventName]) === false) {
+            $this->events[$eventName] = [];
+        }
+
+        $this->events[$eventName][] = $listenerClass;
+
+        return $this;
+    }
+
+    /**
+     * @param LogInterface $log
+     *
+     * @return ApplicationInterface
+     */
+    public function log(LogInterface $log): ApplicationInterface
+    {
+        if (count($this->getLoggers()) === 0) {
+            $this->addLogger(new MemoryLogger());
+        }
+        foreach ($this->getLoggers() as $logger) {
+            $logger->log($log);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $eventName
+     *
+     * @return ApplicationInterface
+     */
+    public function removeEventListeners(string $eventName): ApplicationInterface
+    {
+        if (isset($this->events[$eventName]) === true) {
+            unset($this->events[$eventName]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return ApplicationInterface
+     */
+    public function removeAllEventListeners(): ApplicationInterface
+    {
+        $this->events = [];
+
+        return $this;
+    }
+
+    /**
+     * @return ApplicationConfigurationInterface
+     */
+    public function getConfiguration(): ApplicationConfigurationInterface
+    {
+        return $this->configuration;
+    }
+
+    /**
+     * @return array
+     */
+    public function getEvents(): array
+    {
+        return $this->events;
+    }
+
+    /**
+     * @param string $serviceClass
+     *
+     * @return ServiceInterface
+     */
+    public function getService(string $serviceClass): ServiceInterface
+    {
+        return $this->servicesRegistry->get($serviceClass);
+    }
+
+    /**
+     * @param ServiceInterface $service
+     * @param bool             $overwriteExisting
+     *
+     * @return ApplicationInterface
+     */
+    public function registerService(ServiceInterface $service, bool $overwriteExisting = false): ApplicationInterface
+    {
+        $this->servicesRegistry->registerService($service, $overwriteExisting);
+
+        return $this;
+    }
+
+    /**
+     * @return LoggerInterface[]
+     */
+    public function getLoggers(): array
+    {
+        return $this->loggers;
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     *
+     * @return ApplicationInterface
+     */
+    public function addLogger(LoggerInterface $logger): ApplicationInterface
+    {
+        $this->loggers[] = $logger;
+
+        return $this;
+    }
+
+    /**
+     * @return ControllerInterface|null
+     */
+    public function getController(): ControllerInterface
+    {
+        return $this->controller;
+    }
+
+    /**
+     * @param ControllerInterface $controller
+     *
+     * @return ApplicationInterface
+     */
+    public function setController(ControllerInterface $controller): ApplicationInterface
+    {
+        $this->controller = $controller;
+
+        return $this;
+    }
+
+    /**
+     * @return DispatcherInterface
+     * @throws \RuntimeException
+     */
+    public function getDispatcher(): DispatcherInterface
+    {
+        if ($this->dispatcher === null) {
+            throw new \RuntimeException('Dispatcher object not set.');
+        }
+
+        return $this->dispatcher;
+    }
+
+    /**
+     * @param DispatcherInterface $dispatcher
+     *
+     * @return ApplicationInterface
+     */
+    public function setDispatcher(DispatcherInterface $dispatcher): ApplicationInterface
+    {
+        $this->dispatcher = $dispatcher;
+
+        return $this;
+    }
+
+    /**
+     * @return ExceptionHandler|null
+     */
+    public function getExceptionHandler(): ExceptionHandler
+    {
+        return $this->exceptionHandler;
+    }
+
+    /**
+     * @param ExceptionHandler $exceptionHandler
+     *
+     * @return ApplicationInterface
+     */
+    public function setExceptionHandler(ExceptionHandler $exceptionHandler): ApplicationInterface
+    {
+        $this->exceptionHandler = $exceptionHandler;
+
+        $this->exceptionHandler->setApplication($this);
+
+        return $this;
+    }
+
+    /**
+     * @return RenderInterface
+     */
+    public function getRenderer(): RenderInterface
+    {
+        return $this->renderer;
+    }
+
+    /**
+     * @param RenderInterface $render
+     *
+     * @return ApplicationInterface
+     */
+    public function setRenderer(RenderInterface $render): ApplicationInterface
+    {
+        $this->renderer = $render;
+
+        return $this;
+    }
+
+    /**
+     * @return RepositoryManagerInterface
+     */
+    public function getRepositoryManager(): RepositoryManagerInterface
+    {
+        if ($this->repositoryManager === null) {
+            $repository = new RepositoryManager();
+            $repository->setApplication($this);
+            $this->setRepositoryManager($repository);
+        }
+
+        return $this->repositoryManager;
+    }
+
+    /**
+     * @param RepositoryManagerInterface $repositoryManager
+     *
+     * @return ApplicationInterface
+     */
+    public function setRepositoryManager(RepositoryManagerInterface $repositoryManager): ApplicationInterface
+    {
+        $this->repositoryManager = $repositoryManager;
+
+        return $this;
+    }
+
+    /**
+     * @return RequestInterface
+     */
+    public function getRequest(): RequestInterface
+    {
+        if ($this->request === null) {
+            $this->buildRequest();
+        }
+
+        return $this->request;
+    }
+
+    /**
+     * @param RequestInterface $request
+     *
+     * @return ApplicationInterface
+     */
+    public function setRequest(RequestInterface $request): ApplicationInterface
+    {
+        $this->request = $request;
+
+        return $this;
+    }
+
+    /**
+     * @return ResponseInterface
+     */
+    public function getResponse(): ResponseInterface
+    {
+        return $this->response;
+    }
+
+    /**
+     * @param ResponseInterface $response
+     *
+     * @return ApplicationInterface
+     */
+    public function setResponse(ResponseInterface $response): ApplicationInterface
+    {
+        $this->response = $response;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRootPath(): string
+    {
+        return $this->getConfiguration()
+                    ->getPathValue('rootPath');
+    }
+
+    /**
+     * @param string|null $path
+     *
+     * @return ApplicationInterface
+     */
+    public function setRootPath(string $path = null): ApplicationInterface
+    {
+        $this->getConfiguration()
+             ->setPathValue('rootPath', realpath(dirname(__FILE__, 6)));
+
+        return $this;
     }
 }

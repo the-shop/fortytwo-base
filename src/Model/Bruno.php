@@ -4,13 +4,12 @@ namespace Framework\Base\Model;
 
 use Framework\Base\Application\ApplicationAwareTrait;
 use Framework\Base\Database\DatabaseAdapterInterface;
-use Framework\Base\Model\Modifiers\HashFilter;
 use Framework\Base\Model\Modifiers\FieldModifierInterface;
+use Framework\Base\Model\Modifiers\HashFilter;
 use Framework\Base\Repository\BrunoRepositoryInterface;
 
 /**
  * Base Model for database
- *
  * @package Framework\Base\Model
  */
 abstract class Bruno implements BrunoInterface
@@ -26,6 +25,16 @@ abstract class Bruno implements BrunoInterface
      * @const string
      */
     const EVENT_MODEL_HANDLE_ATTRIBUTE_VALUE_MODIFY_POST = 'EVENT\MODEL\HANDLE_ATTRIBUTE_VALUE_MODIFY_POST';
+
+    /**
+     * @const string
+     */
+    const EVENT_MODEL_CREATE_PRE = 'EVENT\MODEL\CREATE_PRE';
+
+    /**
+     * @const string
+     */
+    const EVENT_MODEL_CREATE_POST = 'EVENT\MODEL\CREATE_POST';
 
     /**
      * @var string
@@ -93,46 +102,16 @@ abstract class Bruno implements BrunoInterface
     }
 
     /**
-     * @return null|string
+     * @return BrunoInterface
      */
-    public function getPrimaryKey()
-    {
-        return $this->primaryKey;
-    }
-
-    /**
-     * @param string $primaryKey
-     * @return $this
-     */
-    public function setPrimaryKey(string $primaryKey)
-    {
-        $this->primaryKey = $primaryKey;
-
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getId()
-    {
-        if (isset($this->primaryKey) === true) {
-            return $this->getAttribute($this->getPrimaryKey());
-        }
-
-        return null;
-    }
-
-    /**
-     * @return $this
-     */
-    public function save()
+    public function save(): BrunoInterface
     {
         $query = $this->getRepository()->createNewQueryForModel($this);
 
         $adapters = $this->getDatabaseAdapters();
 
         if ($this->isNew() === true) {
+            $this->getApplication()->triggerEvent(self::EVENT_MODEL_CREATE_PRE);
             $adapterActionParams = [
                 'method' => 'insertOne',
                 'params' => [
@@ -166,15 +145,134 @@ abstract class Bruno implements BrunoInterface
             $this->dbAttributes = $this->getAttributes();
         }
 
+        if ($this->isNew() === true) {
+            $this->getApplication()->triggerEvent(self::EVENT_MODEL_CREATE_POST, $this);
+        }
+
         $this->setIsNew(false);
 
         return $this;
     }
 
     /**
-     * @return $this
+     * @return BrunoRepositoryInterface|null
      */
-    public function delete()
+    public function getRepository(): BrunoRepositoryInterface
+    {
+        return $this->repository;
+    }
+
+    /**
+     * @param BrunoRepositoryInterface $repository
+     *
+     * @return BrunoInterface
+     */
+    public function setRepository(BrunoRepositoryInterface $repository): BrunoInterface
+    {
+        $this->repository = $repository;
+
+        return $this;
+    }
+
+    /**
+     * @return DatabaseAdapterInterface[]
+     * @todo this shouldnt be here
+     */
+    public function getDatabaseAdapters(): array
+    {
+        return $this->getApplication()
+                    ->getRepositoryManager()
+                    ->getModelAdapters($this->collection);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNew(): bool
+    {
+        return $this->isNew;
+    }
+
+    /**
+     * @param bool $flag
+     *
+     * @return BrunoInterface
+     */
+    public function setIsNew(bool $flag = true): BrunoInterface
+    {
+        $this->isNew = $flag;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAttributes(): array
+    {
+        return $this->attributes;
+    }
+
+    /**
+     * @param array $attributes
+     *
+     * @return BrunoInterface
+     */
+    public function setAttributes(array $attributes = []): BrunoInterface
+    {
+        foreach ($attributes as $key => $value) {
+            $this->setAttribute($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getId()
+    {
+        if (isset($this->primaryKey) === true) {
+            return $this->getAttribute($this->getPrimaryKey());
+        }
+
+        return null;
+    }
+
+    /**
+     * @param string $attributeName
+     *
+     * @return mixed|null
+     */
+    public function getAttribute(string $attributeName)
+    {
+        return isset($this->getAttributes()[$attributeName]) === true ? $this->getAttributes()[$attributeName] : null;
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getPrimaryKey()
+    {
+        return $this->primaryKey;
+    }
+
+    /**
+     * @param string $primaryKey
+     *
+     * @return BrunoInterface
+     */
+    public function setPrimaryKey(string $primaryKey): BrunoInterface
+    {
+        $this->primaryKey = $primaryKey;
+
+        return $this;
+    }
+
+    /**
+     * @return BrunoInterface
+     */
+    public function delete(): BrunoInterface
     {
         $query = $this->getRepository()
                       ->createNewQueryForModel($this)
@@ -197,93 +295,16 @@ abstract class Bruno implements BrunoInterface
     }
 
     /**
-     * @return DatabaseAdapterInterface[]
-     */
-    public function getDatabaseAdapters()
-    {
-        return $this->getApplication()
-            ->getRepositoryManager()
-            ->getModelAdapters($this->collection);
-    }
-
-    /**
      * @return null|string
      */
-    public function getDatabase()
+    public function getDatabase(): string
     {
         return $this->database;
     }
 
     /**
-     * @return string
-     */
-    public function getCollection()
-    {
-        return $this->collection;
-    }
-
-    /**
-     * @return BrunoRepositoryInterface|null
-     */
-    public function getRepository()
-    {
-        return $this->repository;
-    }
-
-    /**
-     * @param \Framework\Base\Repository\BrunoRepositoryInterface $repository
-     *
-     * @return \Framework\Base\Model\BrunoInterface
-     */
-    public function setRepository(BrunoRepositoryInterface $repository): BrunoInterface
-    {
-        $this->repository = $repository;
-
-        return $this;
-    }
-
-    /**
-     * @return null|string
-     */
-    public function getDatabaseAddress()
-    {
-        return $this->databaseAddress;
-    }
-
-    /**
-     * @param string $collection
-     *
-     * @return $this
-     */
-    public function setCollection(string $collection)
-    {
-        $this->collection = $collection;
-
-        return $this;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isNew()
-    {
-        return $this->isNew;
-    }
-
-    /**
-     * @param bool $flag
-     *
-     * @return $this
-     */
-    public function setIsNew(bool $flag = true)
-    {
-        $this->isNew = $flag;
-
-        return $this;
-    }
-
-    /**
      * @param string $databaseName
+     *
      * @return BrunoInterface
      */
     public function setDatabase(string $databaseName): BrunoInterface
@@ -294,7 +315,16 @@ abstract class Bruno implements BrunoInterface
     }
 
     /**
+     * @return null|string
+     */
+    public function getDatabaseAddress(): string
+    {
+        return $this->databaseAddress;
+    }
+
+    /**
      * @param string $databaseAddress
+     *
      * @return BrunoInterface
      */
     public function setDatabaseAddress(string $databaseAddress): BrunoInterface
@@ -305,46 +335,32 @@ abstract class Bruno implements BrunoInterface
     }
 
     /**
-     * @param array $attributes
-     *
-     * @return $this
-     */
-    public function setAttributes(array $attributes = [])
-    {
-        foreach ($attributes as $key => $value) {
-            $this->setAttribute($key, $value);
-        }
-
-        return $this;
-    }
-
-    /**
      * @param string $attribute
-     * @param mixed $value
+     * @param        $value
      *
-     * @return $this
+     * @return BrunoInterface
      * @throws \InvalidArgumentException
      */
-    public function setAttribute(string $attribute, $value)
+    public function setAttribute(string $attribute, $value): BrunoInterface
     {
-        if (array_key_exists($attribute, $this->getDefinedAttributes()) === false) {
-            throw new \InvalidArgumentException('Property "' . $attribute . '" not defined.');
+        if (isset($this->getDefinedAttributes()[$attribute]) === false) {
+            throw new \InvalidArgumentException("Property '$attribute' not defined.");
         }
 
         $this->getApplication()
-            ->triggerEvent(
-                self::EVENT_MODEL_HANDLE_ATTRIBUTE_VALUE_MODIFY_PRE,
-                [
-                    $attribute => $value,
-                ]
-            );
+             ->triggerEvent(
+                 self::EVENT_MODEL_HANDLE_ATTRIBUTE_VALUE_MODIFY_PRE,
+                 [
+                     $attribute => $value,
+                 ]
+             );
 
         if ($attribute === 'password') {
             $this->addFieldFilter('password', new HashFilter());
         }
 
         if ($this->filtersEnabled === true
-            && array_key_exists($attribute, $this->fieldFilters) === true
+            && isset($this->fieldFilters[$attribute]) === true
         ) {
             foreach ($this->fieldFilters[$attribute] as $filter) {
                 /* @var FieldModifierInterface $filter */
@@ -355,36 +371,26 @@ abstract class Bruno implements BrunoInterface
         $this->attributes[$attribute] = $value;
 
         $this->getApplication()
-            ->triggerEvent(
-                self::EVENT_MODEL_HANDLE_ATTRIBUTE_VALUE_MODIFY_POST,
-                $this
-            );
+             ->triggerEvent(
+                 self::EVENT_MODEL_HANDLE_ATTRIBUTE_VALUE_MODIFY_POST,
+                 $this
+             );
 
         return $this;
     }
 
     /**
-     * @return array
+     * @return bool
      */
-    public function getAttributes()
+    public function isDirty(): bool
     {
-        return $this->attributes;
-    }
-
-    /**
-     * @param string $attributeName
-     *
-     * @return mixed|null
-     */
-    public function getAttribute(string $attributeName)
-    {
-        return isset($this->getAttributes()[$attributeName]) === true ? $this->getAttributes()[$attributeName] : null;
+        return empty($this->getDirtyAttributes()) === false;
     }
 
     /**
      * @return array
      */
-    public function getDirtyAttributes()
+    public function getDirtyAttributes(): array
     {
         $attributes = $this->getAttributes();
         $databaseAttributes = $this->getDatabaseAttributes();
@@ -404,18 +410,38 @@ abstract class Bruno implements BrunoInterface
     }
 
     /**
+     * @return array
+     */
+    public function getDatabaseAttributes(): array
+    {
+        return $this->dbAttributes;
+    }
+
+    /**
+     * Determine if the new and old values for a given key are numerically equivalent.
+     *
+     * @param  string $key
+     *
      * @return bool
      */
-    public function isDirty()
+    private function originalIsNumericallyEquivalent($key): bool
     {
-        return empty($this->getDirtyAttributes()) === false;
+        $current = $this->getAttribute($key);
+        $databaseAttributes = $this->getDatabaseAttributes();
+
+        $original = $databaseAttributes[$key];
+
+        return is_numeric($current)
+               && is_numeric($original)
+               && strcmp((string)$current, (string)$original) === 0;
     }
 
     /**
      * @param array $attributes
-     * @return $this
+     *
+     * @return BrunoInterface
      */
-    public function setDatabaseAttributes(array $attributes = [])
+    public function setDatabaseAttributes(array $attributes = []): BrunoInterface
     {
         $this->dbAttributes = $attributes;
 
@@ -436,15 +462,7 @@ abstract class Bruno implements BrunoInterface
     /**
      * @return array
      */
-    public function getDatabaseAttributes()
-    {
-        return $this->dbAttributes;
-    }
-
-    /**
-     * @return array
-     */
-    public function getDefinedAttributes()
+    public function getDefinedAttributes(): array
     {
         return $this->definedAttributes;
     }
@@ -452,7 +470,8 @@ abstract class Bruno implements BrunoInterface
     /**
      * @param array $definition
      *
-     * @return \Framework\Base\Model\BrunoInterface
+     * @return BrunoInterface
+     * @throws \InvalidArgumentException
      */
     public function defineModelAttributes(array $definition = []): BrunoInterface
     {
@@ -495,14 +514,14 @@ abstract class Bruno implements BrunoInterface
     }
 
     /**
-     * @param string $field
+     * @param string                 $field
      * @param FieldModifierInterface $filter
      *
-     * @return \Framework\Base\Model\BrunoInterface
+     * @return BrunoInterface
      */
     public function addFieldFilter(string $field, FieldModifierInterface $filter): BrunoInterface
     {
-        if (array_key_exists($field, $this->fieldFilters) === false) {
+        if (isset($this->fieldFilters[$field]) === false) {
             $this->fieldFilters[$field] = [];
         }
 
@@ -520,9 +539,9 @@ abstract class Bruno implements BrunoInterface
     }
 
     /**
-     * @return $this
+     * @return BrunoInterface
      */
-    public function enableFieldFilters()
+    public function enableFieldFilters(): BrunoInterface
     {
         if ($this->filtersEnabled === false) {
             $this->filtersEnabled = true;
@@ -532,9 +551,9 @@ abstract class Bruno implements BrunoInterface
     }
 
     /**
-     * @return $this
+     * @return BrunoInterface
      */
-    public function disableFieldFilters()
+    public function disableFieldFilters(): BrunoInterface
     {
         if ($this->filtersEnabled === true) {
             $this->filtersEnabled = false;
@@ -546,11 +565,12 @@ abstract class Bruno implements BrunoInterface
     /**
      * Validates collection is set properly, throws exception otherwise
      *
-     * @param $resourceType
-     * @return $this
+     * @param string $resourceType
+     *
+     * @return BrunoInterface
      * @throws \Exception
      */
-    public function confirmResourceOf(string $resourceType)
+    public function confirmResourceOf(string $resourceType): BrunoInterface
     {
         if ($this->getCollection() !== $resourceType) {
             throw new \Exception('Model resource not configured correctly');
@@ -560,20 +580,22 @@ abstract class Bruno implements BrunoInterface
     }
 
     /**
-     * Determine if the new and old values for a given key are numerically equivalent.
-     *
-     * @param  string $key
-     * @return bool
+     * @return string
      */
-    private function originalIsNumericallyEquivalent($key)
+    public function getCollection(): string
     {
-        $current = $this->getAttribute($key);
-        $databaseAttributes = $this->getDatabaseAttributes();
+        return $this->collection;
+    }
 
-        $original = $databaseAttributes[$key];
+    /**
+     * @param string $collection
+     *
+     * @return BrunoInterface
+     */
+    public function setCollection(string $collection): BrunoInterface
+    {
+        $this->collection = $collection;
 
-        return is_numeric($current)
-            && is_numeric($original)
-            && strcmp((string)$current, (string)$original) === 0;
+        return $this;
     }
 }

@@ -11,7 +11,7 @@ class AlphaNumericValidation extends Validation
     /**
      * @return bool
      */
-    public function isValid()
+    public function isValid(): bool
     {
         if (empty($this->getValue()) === true) {
             return true;
@@ -23,7 +23,7 @@ class AlphaNumericValidation extends Validation
     /**
      * @return string
      */
-    public function getRuleName()
+    public function getRuleName(): string
     {
         return 'isAlphaNumeric';
     }

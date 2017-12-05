@@ -4,8 +4,15 @@ namespace Framework\Base\Test\Manager;
 
 use Framework\Base\Test\UnitTest;
 
+/**
+ * Class RepositoryManagerTest
+ * @package Framework\Base\Test\Manager
+ */
 class RepositoryManagerTest extends UnitTest
 {
+    /**
+     *
+     */
     public function testAddingAuthenticatables()
     {
         $authModels = [

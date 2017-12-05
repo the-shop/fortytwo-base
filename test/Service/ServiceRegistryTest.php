@@ -1,13 +1,20 @@
 <?php
 
-namespace Framework\Base\Test\Application;
+namespace Framework\Base\Test\Service;
 
-use Framework\Base\Application\ServicesRegistry;
+use Framework\Base\Service\ServicesRegistry;
 use Framework\Base\Test\Dummies\SampleService;
 use Framework\Base\Test\UnitTest;
 
+/**
+ * Class ServiceRegistryTest
+ * @package Framework\Base\Test\Service
+ */
 class ServiceRegistryTest extends UnitTest
 {
+    /**
+     *
+     */
     public function testRegisterWithServiceInterface()
     {
         $val = new SampleService();
@@ -29,6 +36,9 @@ class ServiceRegistryTest extends UnitTest
         $this->assertAttributeCount(0, 'content', $registry);
     }
 
+    /**
+     *
+     */
     public function testRegisterWithWrongInterface()
     {
         $key = 'sampleService';

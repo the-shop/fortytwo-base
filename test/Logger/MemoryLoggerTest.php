@@ -2,12 +2,19 @@
 
 namespace Framework\Base\Test\Logger;
 
-use Framework\Base\Logger\MemoryLogger;
 use Framework\Base\Logger\Log;
+use Framework\Base\Logger\MemoryLogger;
 use Framework\Base\Test\UnitTest;
 
+/**
+ * Class MemoryLoggerTest
+ * @package Framework\Base\Test\Logger
+ */
 class MemoryLoggerTest extends UnitTest
 {
+    /**
+     *
+     */
     public function testIsInstantiable()
     {
         $logger = new MemoryLogger();
@@ -15,6 +22,9 @@ class MemoryLoggerTest extends UnitTest
         $this->assertInstanceOf(MemoryLogger::class, $logger);
     }
 
+    /**
+     *
+     */
     public function testLogging()
     {
         $logger = new MemoryLogger();

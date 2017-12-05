@@ -15,14 +15,14 @@ interface BrunoInterface extends ApplicationAwareInterface
     /**
      * @return BrunoRepositoryInterface|null
      */
-    public function getRepository();
+    public function getRepository(): BrunoRepositoryInterface;
 
     /**
-     * @param \Framework\Base\Repository\BrunoRepositoryInterface $repository
+     * @param BrunoRepositoryInterface $repository
      *
-     * @return \Framework\Base\Model\BrunoInterface
+     * @return BrunoInterface
      */
-    public function setRepository(BrunoRepositoryInterface $repository);
+    public function setRepository(BrunoRepositoryInterface $repository): BrunoInterface;
 
     /**
      * @return string|null
@@ -36,20 +36,22 @@ interface BrunoInterface extends ApplicationAwareInterface
 
     /**
      * @param string $primaryKey
+     *
      * @return BrunoInterface
      */
-    public function setPrimaryKey(string $primaryKey);
+    public function setPrimaryKey(string $primaryKey): BrunoInterface;
 
     /**
      * @return array
      */
-    public function getAttributes();
+    public function getAttributes(): array;
 
     /**
      * @param array $attributes
+     *
      * @return BrunoInterface
      */
-    public function setAttributes(array $attributes = []);
+    public function setAttributes(array $attributes = []): BrunoInterface;
 
     /**
      * @param string $attributeName
@@ -60,24 +62,27 @@ interface BrunoInterface extends ApplicationAwareInterface
 
     /**
      * @param string $attribute
-     * @param mixed $value
-     * @return mixed
+     * @param        $value
+     *
+     * @return BrunoInterface
      */
-    public function setAttribute(string $attribute, $value);
+    public function setAttribute(string $attribute, $value): BrunoInterface;
 
     /**
      * @param array $attributes
+     *
      * @return BrunoInterface
      */
-    public function setDatabaseAttributes(array $attributes = []);
+    public function setDatabaseAttributes(array $attributes = []): BrunoInterface;
 
     /**
      * @return array
      */
-    public function getDatabaseAttributes();
+    public function getDatabaseAttributes(): array;
 
     /**
      * @param string $attributeName
+     *
      * @return mixed|null
      */
     public function getDatabaseAttribute(string $attributeName);
@@ -85,65 +90,67 @@ interface BrunoInterface extends ApplicationAwareInterface
     /**
      * @return string
      */
-    public function getDatabaseAddress();
+    public function getDatabaseAddress(): string;
 
     /**
      * @param string $databaseAddress
      *
-     * @return \Framework\Base\Model\BrunoInterface
+     * @return BrunoInterface
      */
     public function setDatabaseAddress(string $databaseAddress): BrunoInterface;
 
     /**
      * @return string
      */
-    public function getDatabase();
+    public function getDatabase(): string;
 
     /**
      * @param string $databaseName
      *
-     * @return \Framework\Base\Model\BrunoInterface
+     * @return BrunoInterface
      */
     public function setDatabase(string $databaseName): BrunoInterface;
 
     /**
      * @return string
      */
-    public function getCollection();
+    public function getCollection(): string;
 
     /**
      * @param string $collectionName
+     *
      * @return BrunoInterface
      */
-    public function setCollection(string $collectionName);
+    public function setCollection(string $collectionName): BrunoInterface;
 
     /**
      * @return array
      */
-    public function getDirtyAttributes();
+    public function getDirtyAttributes(): array;
 
     /**
      * @param bool $flag
+     *
      * @return BrunoInterface
      */
-    public function setIsNew(bool $flag = true);
+    public function setIsNew(bool $flag = true): BrunoInterface;
 
     /**
      * @return bool
      */
-    public function isNew();
+    public function isNew(): bool;
 
     /**
-     * @return boolean
+     * @return bool
      */
-    public function isDirty();
+    public function isDirty(): bool;
 
     /**
      * Set allowed attributes of model
      *
      * @param array $definition
      *
-     * @return \Framework\Base\Model\BrunoInterface
+     * @return BrunoInterface
      */
     public function defineModelAttributes(array $definition = []): BrunoInterface;
 
@@ -156,33 +163,34 @@ interface BrunoInterface extends ApplicationAwareInterface
      * @param string                 $field
      * @param FieldModifierInterface $filter
      *
-     * @return \Framework\Base\Model\BrunoInterface
+     * @return BrunoInterface
      */
     public function addFieldFilter(string $field, FieldModifierInterface $filter): BrunoInterface;
 
     /**
      * @return BrunoInterface
      */
-    public function enableFieldFilters();
+    public function enableFieldFilters(): BrunoInterface;
 
     /**
      * @return BrunoInterface
      */
-    public function disableFieldFilters();
+    public function disableFieldFilters(): BrunoInterface;
 
     /**
      * @param string $resourceType
+     *
      * @return BrunoInterface
      */
-    public function confirmResourceOf(string $resourceType);
+    public function confirmResourceOf(string $resourceType): BrunoInterface;
 
     /**
      * @return BrunoInterface
      */
-    public function save();
+    public function save(): BrunoInterface;
 
     /**
      * @return BrunoInterface
      */
-    public function delete();
+    public function delete(): BrunoInterface;
 }

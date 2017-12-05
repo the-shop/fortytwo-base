@@ -2,7 +2,7 @@
 
 namespace Framework\Base\Test\Application;
 
-use Framework\Base\Application\Configuration;
+use Framework\Base\Application\ApplicationConfiguration;
 use Framework\Base\Test\Dummies\TestDatabaseAdapter;
 use Framework\Base\Test\Dummies\TestModel;
 use Framework\Base\Test\Dummies\TestRepository;
@@ -12,11 +12,14 @@ use Framework\Base\Test\UnitTest;
  * Class ConfigurationTest
  * @package Framework\Base\Test\Application
  */
-class ConfigurationTest extends UnitTest
+class ApplicationConfigurationTest extends UnitTest
 {
+    /**
+     *
+     */
     public function testSetGet()
     {
-        $config = new Configuration();
+        $config = new ApplicationConfiguration();
         $config->setPathValue('test', 'value');
 
         $this->assertEquals(['test' => 'value'], $config->getAll());
@@ -65,7 +68,7 @@ class ConfigurationTest extends UnitTest
      */
     public function testReadFromPhpAndReadFromJson()
     {
-        $config = new Configuration();
+        $config = new ApplicationConfiguration();
 
         $config->readFromPhp(dirname(__DIR__) . '/Dummies/dummyConfig.php');
 
@@ -164,7 +167,7 @@ class ConfigurationTest extends UnitTest
      */
     public function testReadFromPhpExceptionThrown()
     {
-        $config = new Configuration();
+        $config = new ApplicationConfiguration();
 
         $file = 'testing.php';
 
@@ -180,7 +183,7 @@ class ConfigurationTest extends UnitTest
      */
     public function testReadFromJsonExceptionThrown()
     {
-        $config = new Configuration();
+        $config = new ApplicationConfiguration();
 
         $file = 'testing.json';
 
@@ -190,19 +193,4 @@ class ConfigurationTest extends UnitTest
 
         $config->readFromJson($file);
     }
-
-    public function testRootPath()
-    {
-        $path = realpath(
-            dirname(__DIR__, 5)
-        );
-
-        $this::assertEquals(
-            $path,
-            $this->getApplication()
-                 ->getConfiguration()
-                 ->getPathValue('rootPath')
-        );
-    }
-
 }

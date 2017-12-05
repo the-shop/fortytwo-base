@@ -3,13 +3,20 @@
 namespace Framework\Base\Test\Dummies;
 
 use Framework\Base\Application\ApplicationAwareTrait;
-use Framework\Base\Application\ServiceInterface;
+use Framework\Base\Service\Service;
 
-class SampleService implements ServiceInterface
+/**
+ * Class SampleService
+ * @package Framework\Base\Test\Dummies
+ */
+class SampleService extends Service
 {
     use ApplicationAwareTrait;
 
-    public function getIdentifier()
+    /**
+     * @return string
+     */
+    public function getIdentifier(): string
     {
         return self::class;
     }

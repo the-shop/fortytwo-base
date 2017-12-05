@@ -15,6 +15,7 @@ class DummyClient
 
     /**
      * DummyClient constructor.
+     *
      * @param string $dsn
      */
     public function __construct(string $dsn)
@@ -31,9 +32,10 @@ class DummyClient
     }
 
     /**
-     * @param $message
+     * @param       $message
      * @param array $params
      * @param array $data
+     *
      * @return array
      */
     public function captureMessage($message, $params = [], $data = [])
@@ -46,8 +48,9 @@ class DummyClient
     }
 
     /**
-     * @param $exception
+     * @param      $exception
      * @param null $data
+     *
      * @return array
      */
     public function captureException($exception, $data = null)

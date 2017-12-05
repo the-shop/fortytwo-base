@@ -11,7 +11,7 @@ class ArrayValidation extends Validation
     /**
      * @return bool
      */
-    public function isValid()
+    public function isValid(): bool
     {
         return is_array($this->getValue()) === true;
     }
@@ -19,7 +19,7 @@ class ArrayValidation extends Validation
     /**
      * @return string
      */
-    public function getRuleName()
+    public function getRuleName(): string
     {
         return 'isArray';
     }

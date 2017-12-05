@@ -10,6 +10,7 @@ class LowerCaseFilter implements FieldModifierInterface
 {
     /**
      * @param $value
+     *
      * @return string
      * @throws \Exception
      */

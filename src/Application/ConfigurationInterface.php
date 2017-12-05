@@ -10,6 +10,7 @@ interface ConfigurationInterface
 {
     /**
      * ConfigurationInterface constructor.
+     *
      * @param array $configurationValues
      */
     public function __construct(array $configurationValues = []);
@@ -21,13 +22,15 @@ interface ConfigurationInterface
 
     /**
      * @param string $dotPath
-     * @param $value
-     * @return mixed
+     * @param        $value
+     *
+     * @return ConfigurationInterface
      */
-    public function setPathValue(string $dotPath, $value);
+    public function setPathValue(string $dotPath, $value): ConfigurationInterface;
 
     /**
      * @param string $dotPath
+     *
      * @return mixed
      */
     public function getPathValue(string $dotPath);
@@ -40,14 +43,14 @@ interface ConfigurationInterface
     /**
      * @param string $path
      *
-     * @return \Framework\Base\Application\ConfigurationInterface
+     * @return ConfigurationInterface
      */
     public function readFromJson(string $path): ConfigurationInterface;
 
     /**
      * @param string $path
      *
-     * @return \Framework\Base\Application\ConfigurationInterface
+     * @return ConfigurationInterface
      */
     public function readFromPhp(string $path): ConfigurationInterface;
 }

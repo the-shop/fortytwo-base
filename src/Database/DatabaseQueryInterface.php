@@ -10,25 +10,27 @@ interface DatabaseQueryInterface
 {
     /**
      * @param string $name
-     * @return \Framework\Base\Database\DatabaseQueryInterface
+     *
+     * @return DatabaseQueryInterface
      */
-    public function setDatabase(string $name);
+    public function setDatabase(string $name): DatabaseQueryInterface;
 
     /**
      * @return string
      */
-    public function getDatabase();
+    public function getDatabase(): string;
 
     /**
      * @param string $name
-     * @return \Framework\Base\Database\DatabaseQueryInterface
+     *
+     * @return DatabaseQueryInterface
      */
-    public function setCollection(string $name);
+    public function setCollection(string $name): DatabaseQueryInterface;
 
     /**
      * @return string
      */
-    public function getCollection();
+    public function getCollection(): string;
 
     /**
      * @return array
@@ -37,9 +39,10 @@ interface DatabaseQueryInterface
 
     /**
      * @param string $name
-     * @return \Framework\Base\Database\DatabaseQueryInterface
+     *
+     * @return DatabaseQueryInterface
      */
-    public function addSelectField(string $name);
+    public function addSelectField(string $name): DatabaseQueryInterface;
 
     /**
      * @return array
@@ -48,9 +51,10 @@ interface DatabaseQueryInterface
 
     /**
      * @param int $limit
-     * @return \Framework\Base\Database\DatabaseQueryInterface
+     *
+     * @return DatabaseQueryInterface
      */
-    public function setLimit(int $limit);
+    public function setLimit(int $limit): DatabaseQueryInterface;
 
     /**
      * @return int
@@ -59,9 +63,10 @@ interface DatabaseQueryInterface
 
     /**
      * @param int $offset
-     * @return \Framework\Base\Database\DatabaseQueryInterface
+     *
+     * @return DatabaseQueryInterface
      */
-    public function setOffset(int $offset);
+    public function setOffset(int $offset): DatabaseQueryInterface;
 
     /**
      * @return int
@@ -73,24 +78,24 @@ interface DatabaseQueryInterface
      * @param string $condition
      * @param        $value
      *
-     * @return \Framework\Base\Database\DatabaseQueryInterface
+     * @return DatabaseQueryInterface
      */
-    public function addAndCondition(string $field, string $condition, $value);
+    public function addAndCondition(string $field, string $condition, $value): DatabaseQueryInterface;
 
     /**
      * @param string $field
-     * @param $value
+     * @param array  $value
      *
-     * @return \Framework\Base\Database\DatabaseQueryInterface
+     * @return DatabaseQueryInterface
      */
-    public function whereInArrayCondition(string $field, $value = []);
+    public function whereInArrayCondition(string $field, $value = []): DatabaseQueryInterface;
 
     /**
      * @param string $identifier
      *
-     * @return \Framework\Base\Database\DatabaseQueryInterface
+     * @return DatabaseQueryInterface
      */
-    public function setOrderBy(string $identifier);
+    public function setOrderBy(string $identifier): DatabaseQueryInterface;
 
     /**
      * @return string
@@ -100,9 +105,9 @@ interface DatabaseQueryInterface
     /**
      * @param string $orderDirection
      *
-     * @return \Framework\Base\Database\DatabaseQueryInterface
+     * @return DatabaseQueryInterface
      */
-    public function setOrderDirection(string $orderDirection);
+    public function setOrderDirection(string $orderDirection): DatabaseQueryInterface;
 
     /**
      * @return string

@@ -2,19 +2,32 @@
 
 namespace Framework\Base\Test\Dummies;
 
-use Framework\Base\Application\ApplicationConfiguration;
+use Framework\Base\Application\ApplicationConfigurationInterface;
 use Framework\Base\Application\BaseApplication;
+use Framework\Base\Request\RequestInterface;
 
+/**
+ * Class DummyApplication
+ * @package Framework\Base\Test\Dummies
+ */
 class DummyApplication extends BaseApplication
 {
-    public function __construct(ApplicationConfiguration $applicationConfiguration = null)
+    /**
+     * DummyApplication constructor.
+     *
+     * @param ApplicationConfigurationInterface|null $applicationConfiguration
+     */
+    public function __construct(ApplicationConfigurationInterface $applicationConfiguration = null)
     {
         $this->setResponse(new DummyResponse());
 
         parent::__construct($applicationConfiguration);
     }
 
-    public function buildRequest()
+    /**
+     * @return RequestInterface
+     */
+    public function buildRequest(): RequestInterface
     {
         $request = new DummyRequest();
 

@@ -11,7 +11,7 @@ class NumericValidation extends Validation
     /**
      * @return bool
      */
-    public function isValid()
+    public function isValid(): bool
     {
         return is_numeric($this->getValue()) === true;
     }
@@ -19,7 +19,7 @@ class NumericValidation extends Validation
     /**
      * @return string
      */
-    public function getRuleName()
+    public function getRuleName(): string
     {
         return 'isNumeric';
     }

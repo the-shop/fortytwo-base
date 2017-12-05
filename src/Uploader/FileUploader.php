@@ -28,22 +28,22 @@ abstract class FileUploader implements FileUploaderInterface
     }
 
     /**
+     * @return mixed
+     */
+    public function getClient()
+    {
+        return $this->client;
+    }
+
+    /**
      * @param $client
      *
-     * @return \Framework\Base\Uploader\FileUploaderInterface
+     * @return FileUploaderInterface
      */
     public function setClient($client): FileUploaderInterface
     {
         $this->client = $client;
 
         return $this;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getClient()
-    {
-        return $this->client;
     }
 }

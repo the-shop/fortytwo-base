@@ -12,7 +12,7 @@ use Framework\Base\Mailer\MailInterface;
 class DummyMailer extends Mailer
 {
     /**
-     * @param \Framework\Base\Mailer\MailInterface $mail
+     * @param MailInterface $mail
      *
      * @return string
      */

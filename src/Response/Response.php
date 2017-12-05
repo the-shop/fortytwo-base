@@ -13,6 +13,9 @@ abstract class Response implements ResponseInterface
      */
     private $body = null;
 
+    /**
+     * @var int
+     */
     private $code;
 
     /**
@@ -26,7 +29,7 @@ abstract class Response implements ResponseInterface
     /**
      * @param $responseBody
      *
-     * @return \Framework\Base\Response\ResponseInterface
+     * @return ResponseInterface
      */
     public function setBody($responseBody): ResponseInterface
     {
@@ -46,7 +49,7 @@ abstract class Response implements ResponseInterface
     /**
      * @param int $code
      *
-     * @return \Framework\Base\Response\ResponseInterface
+     * @return ResponseInterface
      */
     public function setCode(int $code): ResponseInterface
     {

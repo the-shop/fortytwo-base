@@ -20,6 +20,7 @@ abstract class Validation implements ValidationInterface
 
     /**
      * Validation constructor.
+     *
      * @param $value
      */
     public function __construct($value)

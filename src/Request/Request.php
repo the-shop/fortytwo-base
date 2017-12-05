@@ -2,6 +2,10 @@
 
 namespace Framework\Base\Request;
 
+/**
+ * Class Request
+ * @package Framework\Base\Request
+ */
 abstract class Request implements RequestInterface
 {
     /**
@@ -9,15 +13,23 @@ abstract class Request implements RequestInterface
      */
     private $uri = null;
 
+    /**
+     * @return string
+     */
+    public function getUri(): string
+    {
+        return $this->uri;
+    }
+
+    /**
+     * @param string $uri
+     *
+     * @return RequestInterface
+     */
     public function setUri(string $uri): RequestInterface
     {
         $this->uri = $uri;
 
         return $this;
-    }
-
-    public function getUri(): string
-    {
-        return $this->uri;
     }
 }

@@ -14,7 +14,16 @@ class ValidationException extends \Exception
     private $failedValidations = [];
 
     /**
+     * @return array
+     */
+    public function getFailedValidations()
+    {
+        return $this->failedValidations;
+    }
+
+    /**
      * @param array $validations
+     *
      * @return $this
      */
     public function setFailedValidations(array $validations)
@@ -22,13 +31,5 @@ class ValidationException extends \Exception
         $this->failedValidations = $validations;
 
         return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getFailedValidations()
-    {
-        return $this->failedValidations;
     }
 }

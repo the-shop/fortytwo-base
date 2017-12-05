@@ -10,6 +10,7 @@ class TrimFilter implements FieldModifierInterface
 {
     /**
      * @param $value
+     *
      * @return string
      * @throws \Exception
      */

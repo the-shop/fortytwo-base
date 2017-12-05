@@ -34,7 +34,7 @@ abstract class Mailer implements MailerInterface
     /**
      * @param $client
      *
-     * @return \Framework\Base\Mailer\MailerInterface
+     * @return MailerInterface
      */
     public function setClient($client): MailerInterface
     {

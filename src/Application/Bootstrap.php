@@ -8,14 +8,18 @@ namespace Framework\Base\Application;
  */
 class Bootstrap
 {
+    /**
+     * @var array
+     */
     private $registerModules = [];
 
     /**
-     * @param array $moduleInterfaceClassNames
+     * @param array           $moduleInterfaceClassNames
      * @param BaseApplication $application
-     * @return $this
+     *
+     * @return Bootstrap
      */
-    public function registerModules(array $moduleInterfaceClassNames, BaseApplication $application)
+    public function registerModules(array $moduleInterfaceClassNames, BaseApplication $application): Bootstrap
     {
         $this->registerModules = $moduleInterfaceClassNames;
 

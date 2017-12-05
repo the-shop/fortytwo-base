@@ -3,9 +3,12 @@
 namespace Framework\Base\Router;
 
 use Framework\Base\Application\ApplicationAwareInterface;
-use Framework\Base\Application\ControllerInterface;
 use Framework\Base\Request\RequestInterface;
 
+/**
+ * Interface DispatcherInterface
+ * @package Framework\Base\Router
+ */
 interface DispatcherInterface extends ApplicationAwareInterface
 {
     /**
@@ -15,28 +18,30 @@ interface DispatcherInterface extends ApplicationAwareInterface
 
     /**
      * @param RequestInterface $request
+     *
      * @return mixed
      */
     public function parseRequest(RequestInterface $request);
 
     /**
-     * @return ControllerInterface
+     * @return string
      */
-    public function getHandler();
+    public function getHandler(): string;
 
     /**
      * @return array
      */
-    public function getRoutes();
+    public function getRoutes(): array;
 
     /**
-     * @return mixed
+     * @return array
      */
-    public function getRouteParameters();
+    public function getRouteParameters(): array;
 
     /**
      * @param array $routesDefinition
-     * @return mixed
+     *
+     * @return DispatcherInterface
      */
-    public function addRoutes(array $routesDefinition = []);
+    public function addRoutes(array $routesDefinition = []): DispatcherInterface;
 }

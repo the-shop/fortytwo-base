@@ -11,17 +11,17 @@ class EmailValidation extends Validation
     /**
      * @return bool
      */
-    public function isValid()
+    public function isValid(): bool
     {
-        return is_string($this->getValue()) === true &&
-            strlen($this->getValue()) < 254 &&
-            filter_var($this->getValue(), FILTER_VALIDATE_EMAIL) !== false;
+        return is_string($this->getValue()) === true
+               && strlen($this->getValue()) < 254
+               && filter_var($this->getValue(), FILTER_VALIDATE_EMAIL) !== false;
     }
 
     /**
      * @return string
      */
-    public function getRuleName()
+    public function getRuleName(): string
     {
         return 'isEmail';
     }

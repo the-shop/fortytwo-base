@@ -10,7 +10,8 @@ interface QueueAdapterInterface
 {
     /**
      * @param string $queueName
-     * @param array $payload
+     * @param array  $payload
+     *
      * @return mixed
      */
     public function handle(string $queueName, array $payload = []);

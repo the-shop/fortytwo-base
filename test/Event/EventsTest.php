@@ -36,9 +36,12 @@ class EventsTest extends UnitTest
         $app->removeAllEventListeners();
         $app->listen(self::TEST_EVENT, TestListener::class);
 
-        $this->assertEquals([
-            self::TEST_EVENT => [TestListener::class]
-        ], $app->getEvents());
+        $this->assertEquals(
+            [
+                self::TEST_EVENT => [TestListener::class]
+            ],
+            $app->getEvents()
+        );
     }
 
     /**
@@ -72,19 +75,22 @@ class EventsTest extends UnitTest
     public function testApplicationTriggerEventWithFewListeners()
     {
         $app = $this->getApplication();
-        for ($i = 0; $i < 5; $i++) {
+        for ($i = 0; $i < 5; $i ++) {
             $app->listen(self::TEST_EVENT, TestListener::class);
         }
 
         $out = $app->triggerEvent(self::TEST_EVENT, 'Test Payload');
 
-        $this->assertEquals([
-            'Test Payload',
-            'Test Payload',
-            'Test Payload',
-            'Test Payload',
-            'Test Payload'
-            ], $out);
+        $this->assertEquals(
+            [
+                'Test Payload',
+                'Test Payload',
+                'Test Payload',
+                'Test Payload',
+                'Test Payload'
+            ],
+            $out
+        );
     }
 
     /**

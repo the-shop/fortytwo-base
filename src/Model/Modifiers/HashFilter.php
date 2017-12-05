@@ -10,6 +10,7 @@ class HashFilter implements FieldModifierInterface
 {
     /**
      * @param $value
+     *
      * @return bool|string
      */
     public function modify($value)

@@ -11,16 +11,16 @@ class NonEmptyValidation extends Validation
     /**
      * @return bool
      */
-    public function isValid()
+    public function isValid(): bool
     {
-        return empty($this->getValue()) === false ||
-            is_numeric($this->getValue()) === true;
+        return empty($this->getValue()) === false
+               || is_numeric($this->getValue()) === true;
     }
 
     /**
      * @return string
      */
-    public function getRuleName()
+    public function getRuleName(): string
     {
         return 'isNonEmpty';
     }

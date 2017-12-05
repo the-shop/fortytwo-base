@@ -2,6 +2,9 @@
 
 namespace Framework\Base\Application;
 
+use Framework\Base\Manager\RepositoryManagerInterface;
+use Framework\Base\Repository\BrunoRepositoryInterface;
+
 /**
  * Interface ControllerInterface
  * @package Framework\Base\Application
@@ -9,13 +12,14 @@ namespace Framework\Base\Application;
 interface ControllerInterface extends ApplicationAwareInterface
 {
     /**
-     * @return \Framework\Base\Manager\RepositoryManagerInterface
+     * @return RepositoryManagerInterface
      */
     public function getRepositoryManager();
 
     /**
      * @param $fullyQualifiedClassName
-     * @return \Framework\Base\Repository\BrunoRepositoryInterface
+     *
+     * @return BrunoRepositoryInterface
      */
     public function getRepository($fullyQualifiedClassName);
 }

@@ -12,15 +12,16 @@ class Parse
      * Returns integer of timestamp if sent in seconds or microseconds, throws exception otherwise
      *
      * @param $input
+     *
      * @return int
      * @throws \Exception
      */
-    public static function unixTimestamp($input)
+    public static function unixTimestamp($input): int
     {
         if (strlen((string)$input) === 10) {
             return (int)$input;
         } elseif (strlen((string)$input) === 13) {
-            return (int)substr((string)$input, 0, -3);
+            return (int)substr((string)$input, 0, - 3);
         }
 
         throw new \Exception('Unrecognized unix timestamp format.');
@@ -28,10 +29,11 @@ class Parse
 
     /**
      * @param $float
+     *
      * @return float
      * @throws \Exception
      */
-    public static function float($float)
+    public static function float($float): float
     {
         if (is_float($float)) {
             return $float;
@@ -46,10 +48,11 @@ class Parse
 
     /**
      * @param $input
+     *
      * @return int
      * @throws \Exception
      */
-    public static function integer($input)
+    public static function integer($input): int
     {
         if (is_numeric($input) === true) {
             return (int)$input;

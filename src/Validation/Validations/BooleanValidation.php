@@ -11,7 +11,7 @@ class BooleanValidation extends Validation
     /**
      * @return bool
      */
-    public function isValid()
+    public function isValid(): bool
     {
         return is_bool($this->getValue()) === true;
     }
@@ -19,7 +19,7 @@ class BooleanValidation extends Validation
     /**
      * @return string
      */
-    public function getRuleName()
+    public function getRuleName(): string
     {
         return 'isBool';
     }

@@ -16,7 +16,7 @@ interface RequestInterface
     /**
      * @param string $uri
      *
-     * @return \Framework\Base\Request\RequestInterface
+     * @return RequestInterface
      */
     public function setUri(string $uri): RequestInterface;
 }

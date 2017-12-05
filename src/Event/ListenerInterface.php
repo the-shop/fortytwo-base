@@ -12,6 +12,7 @@ interface ListenerInterface extends ApplicationAwareInterface
 {
     /**
      * @param $payload
+     *
      * @return mixed
      */
     public function handle($payload);
