@@ -4,7 +4,7 @@ return [
     'env' => [
         'DATABASE_NAME' => getenv('DATABASE_NAME'),
         'DATABASE_ADDRESS' => getenv('DATABASE_ADDRESS'),
-        'SENTRY_DSN' => getenv('SENTRY_DSNSENTRY_DSN'),
+        'SENTRY_DSN' => getenv('SENTRY_DSN'),
         'RABBIT_MQ_HOST' => getenv('RABBIT_MQ_HOST'),
         'RABBIT_MQ_PORT' => getenv('RABBIT_MQ_PORT'),
         'RABBIT_MQ_USER' => getenv('RABBIT_MQ_USER'),
