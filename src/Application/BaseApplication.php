@@ -18,7 +18,7 @@ use Framework\Base\Router\DispatcherInterface;
 use Framework\Base\Service\ServiceInterface;
 use Framework\Base\Service\ServicesRegistry;
 use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
+use GuzzleHttp\Exception\GuzzleException;
 
 /**
  * Class BaseApplication
@@ -124,6 +124,11 @@ abstract class BaseApplication implements ApplicationInterface, ApplicationAware
     private $configuration = null;
 
     /**
+     * @var null
+     */
+    private $httpClient = null;
+
+    /**
      * Has to build instance of RequestInterface, set it to BaseApplication and return it
      * @return RequestInterface
      */
@@ -199,52 +204,6 @@ abstract class BaseApplication implements ApplicationInterface, ApplicationAware
     }
 
     /**
-     * @return ResponseInterface
-     */
-    public function handle()
-    {
-        $dispatcher = $this->getDispatcher();
-
-        $handlerPath = $dispatcher->getHandler();
-
-        $handlerPathParts = explode('::', $handlerPath);
-
-        list($controllerClass, $action) = $handlerPathParts;
-
-        /* @var ControllerInterface $controller */
-        $controller = new $controllerClass();
-        $this->setController($controller);
-        $controller->setApplication($this);
-
-        $parameterValues = array_values(
-            $this->getDispatcher()
-                 ->getRouteParameters()
-        );
-
-        $handlerOutput = $controller->{$action}(...$parameterValues);
-
-        $response = $this->getResponse();
-        $response->setBody($handlerOutput);
-
-        return $response;
-    }
-
-    /**
-     * @param RequestInterface $request
-     *
-     * @return ApplicationInterface
-     */
-    public function parseRequest(RequestInterface $request): ApplicationInterface
-    {
-        $dispatcher = $this->getDispatcher();
-        $dispatcher->setApplication($this);
-        $dispatcher->register();
-        $dispatcher->parseRequest($request);
-
-        return $this;
-    }
-
-    /**
      * @param string $eventName
      * @param null   $payload
      *
@@ -272,15 +231,73 @@ abstract class BaseApplication implements ApplicationInterface, ApplicationAware
     }
 
     /**
+     * @return ResponseInterface
+     * @throws \BadMethodCallException
+     * @throws \RuntimeException
+     */
+    public function handle()
+    {
+        $dispatcher = $this->getDispatcher();
+
+        $handlerPath = $dispatcher->getHandler();
+
+        $handlerPathParts = explode('::', $handlerPath);
+
+        list($controllerClass, $action) = $handlerPathParts;
+
+        /* @var ControllerInterface $controller */
+        $controller = new $controllerClass();
+
+        if (($controller instanceof ControllerInterface) === false) {
+            throw new \RuntimeException("$controllerClass must be instance of ControllerInterface");
+        }
+        $this->setController($controller);
+        $controller->setApplication($this);
+
+        $parameterValues = array_values(
+            $this->getDispatcher()
+                 ->getRouteParameters()
+        );
+
+        if (method_exists($controller, $action) === false) {
+            throw new \BadMethodCallException(
+                "Method $action does not exist in $controllerClass. Check Your config file."
+            );
+        }
+
+        $handlerOutput = $controller->{$action}(...$parameterValues);
+
+        $response = $this->getResponse();
+        $response->setBody($handlerOutput);
+
+        return $response;
+    }
+
+    /**
+     * @param RequestInterface $request
+     *
+     * @return ApplicationInterface
+     */
+    public function parseRequest(RequestInterface $request): ApplicationInterface
+    {
+        $dispatcher = $this->getDispatcher();
+        $dispatcher->setApplication($this);
+        $dispatcher->register();
+        $dispatcher->parseRequest($request);
+
+        return $this;
+    }
+
+    /**
      * @param string $method
      * @param string $uri
      * @param array  $params
      *
-     * @return mixed|\Psr\Http\Message\ResponseInterface
+     * @return ResponseInterface
      * @throws GuzzleHttpException
      * @throws MethodNotAllowedException
      */
-    public function httpRequest(string $method, string $uri = '', array $params = [])
+    public function httpRequest(string $method, string $uri = '', array $params = []): ResponseInterface
     {
         $allowedHttpMethods = [
             'GET',
@@ -300,11 +317,11 @@ abstract class BaseApplication implements ApplicationInterface, ApplicationAware
             throw $exception;
         }
 
-        $client = new Client();
+        $client = $this->getHttpClient();
 
         try {
             $guzzleHttpResponse = $client->request($method, $uri, $params);
-        } catch (RequestException $requestException) {
+        } catch (GuzzleException $requestException) {
             if ($requestException->hasResponse() === false) {
                 $message = $requestException->getMessage();
                 $code = null;
@@ -510,6 +527,30 @@ abstract class BaseApplication implements ApplicationInterface, ApplicationAware
     }
 
     /**
+     * @return Client|null
+     */
+    public function getHttpClient()
+    {
+        if ($this->httpClient === null) {
+            $this->httpClient = new Client();
+        }
+
+        return $this->httpClient;
+    }
+
+    /**
+     * @param $client
+     *
+     * @return ApplicationInterface
+     */
+    public function setHttpClient($client): ApplicationInterface
+    {
+        $this->httpClient = $client;
+
+        return $this;
+    }
+
+    /**
      * @return RenderInterface
      */
     public function getRenderer(): RenderInterface
@@ -619,5 +660,13 @@ abstract class BaseApplication implements ApplicationInterface, ApplicationAware
              ->setPathValue('rootPath', realpath(dirname(__FILE__, 6)));
 
         return $this;
+    }
+
+    /**
+     * @return RegistryInterface
+     */
+    public function getServicesRegistry(): RegistryInterface
+    {
+        return $this->servicesRegistry;
     }
 }

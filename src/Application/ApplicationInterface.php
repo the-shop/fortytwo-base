@@ -3,6 +3,8 @@
 namespace Framework\Base\Application;
 
 use Framework\Base\Application\Exception\ExceptionHandler;
+use Framework\Base\Application\Exception\GuzzleHttpException;
+use Framework\Base\Application\Exception\MethodNotAllowedException;
 use Framework\Base\Logger\LoggerInterface;
 use Framework\Base\Logger\LogInterface;
 use Framework\Base\Manager\RepositoryManagerInterface;
@@ -34,6 +36,14 @@ interface ApplicationInterface
     public function bootstrap(): Bootstrap;
 
     /**
+     * @param string $eventName
+     * @param null   $payload
+     *
+     * @return array
+     */
+    public function triggerEvent(string $eventName, $payload = null): array;
+
+    /**
      * @return ResponseInterface
      */
     public function handle();
@@ -46,25 +56,17 @@ interface ApplicationInterface
     public function parseRequest(RequestInterface $request): ApplicationInterface;
 
     /**
-     * @param string $eventName
-     * @param null   $payload
-     *
-     * @return array
-     */
-    public function triggerEvent(string $eventName, $payload = null): array;
-
-    /**
      * Curl Request method
      *
      * @param string $method
      * @param string $uri
      * @param array  $params
      *
-     * @throws \RuntimeException
-     * @throws \Framework\Base\Application\Exception\GuzzleHttpException
-     * @return mixed|\Psr\Http\Message\ResponseInterface
+     * @throws MethodNotAllowedException
+     * @throws GuzzleHttpException
+     * @return ResponseInterface
      */
-    public function httpRequest(string $method, string $uri = '', array $params = []);
+    public function httpRequest(string $method, string $uri = '', array $params = []): ResponseInterface;
 
     /**
      * @param string $eventName
@@ -167,6 +169,18 @@ interface ApplicationInterface
     public function setExceptionHandler(ExceptionHandler $exceptionHandler): ApplicationInterface;
 
     /**
+     * @return mixed
+     */
+    public function getHttpClient();
+
+    /**
+     * @param $client
+     *
+     * @return ApplicationInterface
+     */
+    public function setHttpClient($client): ApplicationInterface;
+
+    /**
      * @return RenderInterface
      */
     public function getRenderer(): RenderInterface;
@@ -225,4 +239,9 @@ interface ApplicationInterface
      * @return ApplicationInterface
      */
     public function setRootPath(string $path): ApplicationInterface;
+
+    /**
+     * @return RegistryInterface
+     */
+    public function getServicesRegistry(): RegistryInterface;
 }

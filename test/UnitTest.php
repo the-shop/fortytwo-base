@@ -94,18 +94,19 @@ class UnitTest extends TestCase
     }
 
     /**
-     * @param $modelsConfig
+     * @param array  $modelsConfig
+     * @param string $repository
      *
      * @return array
      */
-    protected function generateModelsConfiguration(array $modelsConfig)
+    protected function generateModelsConfiguration(array $modelsConfig, string $repository = TestRepository::class)
     {
         $generatedConfiguration = [
             'resources' => [],
             'modelFields' => [],
         ];
         foreach ($modelsConfig as $modelName => $options) {
-            $generatedConfiguration['resources'][$options['collection']] = TestRepository::class;
+            $generatedConfiguration['resources'][$options['collection']] = $repository;
             $generatedConfiguration['modelFields'][$options['collection']] = $options['fields'];
         }
 
