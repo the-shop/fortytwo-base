@@ -14,6 +14,8 @@ class ExceptionHandler implements ApplicationAwareInterface
 {
     use ApplicationAwareTrait;
 
+    private $exception = null;
+
     /**
      * @const string
      */
@@ -32,15 +34,21 @@ class ExceptionHandler implements ApplicationAwareInterface
     public function handle(\Exception $e)
     {
         $application = $this->getApplication();
-
         $application->triggerEvent(self::EVENT_EXCEPTION_HANDLER_HANDLE_PRE, $e);
 
         $errorLog = new Log($e);
 
         $application->log($errorLog);
 
+        $this->exception = $e;
+
         $application->triggerEvent(self::EVENT_EXCEPTION_HANDLER_HANDLE_POST, $e);
 
         return $this;
+    }
+
+    public function getException()
+    {
+        return $this->exception;
     }
 }

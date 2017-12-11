@@ -27,4 +27,12 @@ class MemoryRenderer extends Render
 
         return $this->response;
     }
+
+    /**
+     * @return ResponseInterface|null
+     */
+    public function getResponse()
+    {
+        return $this->response;
+    }
 }

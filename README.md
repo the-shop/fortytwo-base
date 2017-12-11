@@ -17,6 +17,5 @@ Install
 ---
 `sentry/sentry`  
 `guzzlehttp/guzzle`  
-`symfony/dotenv`  
 `php-amqplib/php-amqplib`  
 `zendframework/zend-stdlib`

@@ -1,8 +1,7 @@
 <?php
 
-namespace Application\Services;
+namespace Framework\Base\Service;
 
-use Framework\Base\Service\Service;
 use Framework\Base\Uploader\FileUploaderInterface;
 
 /**
