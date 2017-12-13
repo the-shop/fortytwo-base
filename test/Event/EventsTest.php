@@ -70,9 +70,9 @@ class EventsTest extends UnitTest
     }
 
     /**
-     * Test application->triggerEvent() - with few listeners - success
+     * Test application->listen() - with same listener multiple times on one hook - only one registered
      */
-    public function testApplicationTriggerEventWithFewListeners()
+    public function testApplicationRegisterOneListenerMultipleTimesOnSameHook()
     {
         $app = $this->getApplication();
         for ($i = 0; $i < 5; $i ++) {
@@ -83,10 +83,6 @@ class EventsTest extends UnitTest
 
         $this->assertEquals(
             [
-                'Test Payload',
-                'Test Payload',
-                'Test Payload',
-                'Test Payload',
                 'Test Payload'
             ],
             $out
