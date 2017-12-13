@@ -354,7 +354,9 @@ abstract class BaseApplication implements ApplicationInterface, ApplicationAware
             $this->events[$eventName] = [];
         }
 
-        $this->events[$eventName][] = $listenerClass;
+        if (in_array($listenerClass, $this->events[$eventName]) === false) {
+            $this->events[$eventName][] = $listenerClass;
+        }
 
         return $this;
     }
