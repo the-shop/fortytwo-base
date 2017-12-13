@@ -37,8 +37,8 @@ class Mail implements MailInterface
      * @var array
      */
     private $options = [
-        'cc' => '',
-        'bcc' => '',
+        'cc' => null,
+        'bcc' => null,
     ];
 
     /**
