@@ -2,6 +2,8 @@
 
 namespace Framework\Base\Application;
 
+use Framework\Base\Module\ModuleInterface;
+
 /**
  * Class Bootstrap
  * @package Framework\Base\Application
@@ -9,9 +11,9 @@ namespace Framework\Base\Application;
 class Bootstrap
 {
     /**
-     * @var array
+     * @var ModuleInterface[]
      */
-    private $registerModules = [];
+    private $modules = [];
 
     /**
      * @param array           $moduleInterfaceClassNames
@@ -19,15 +21,27 @@ class Bootstrap
      *
      * @return Bootstrap
      */
-    public function registerModules(array $moduleInterfaceClassNames, BaseApplication $application): Bootstrap
+    public function loadModulesConfigs(array $moduleInterfaceClassNames, BaseApplication $application): Bootstrap
     {
-        $this->registerModules = $moduleInterfaceClassNames;
+        foreach ($moduleInterfaceClassNames as $moduleClass) {
+            /* @var \Framework\Base\Module\ModuleInterface $module */
+            $module = new $moduleClass();
+            $module->setApplication($application)
+                   ->loadConfig();
 
-        foreach ($this->registerModules as $moduleClass) {
-            /* @var \Framework\Base\Module\ModuleInterface $instance */
-            $instance = new $moduleClass();
-            $instance->setApplication($application);
-            $instance->bootstrap();
+            $this->modules[] = $module;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Bootstrap
+     */
+    public function registerModules(): Bootstrap
+    {
+        foreach ($this->modules as $module) {
+            $module->bootstrap();
         }
 
         return $this;

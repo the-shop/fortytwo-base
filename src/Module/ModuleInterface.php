@@ -11,6 +11,11 @@ use Framework\Base\Application\ApplicationAwareInterface;
 interface ModuleInterface extends ApplicationAwareInterface
 {
     /**
+     * Load module configuration into application configuration instance
+     */
+    public function loadConfig();
+
+    /**
      * Bootstrap module
      */
     public function bootstrap();

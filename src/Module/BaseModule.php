@@ -69,4 +69,10 @@ abstract class BaseModule implements ModuleInterface
 
         return $files;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function bootstrap()
+    {}
 }

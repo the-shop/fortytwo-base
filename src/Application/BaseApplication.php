@@ -129,6 +129,11 @@ abstract class BaseApplication implements ApplicationInterface, ApplicationAware
     private $httpClient = null;
 
     /**
+     * @var Bootstrap
+     */
+    private $bootstrap = null;
+
+    /**
      * Has to build instance of RequestInterface, set it to BaseApplication and return it
      * @return RequestInterface
      */
@@ -149,7 +154,7 @@ abstract class BaseApplication implements ApplicationInterface, ApplicationAware
 
         $this->setRootPath()
              ->setExceptionHandler(new ExceptionHandler())
-             ->bootstrap();
+             ->initialize();
     }
 
     /**
@@ -187,20 +192,28 @@ abstract class BaseApplication implements ApplicationInterface, ApplicationAware
     }
 
     /**
-     * @return Bootstrap
+     *
      */
-    public function bootstrap(): Bootstrap
+    public function initialize()
     {
         $this->servicesRegistry = new ServicesRegistry();
         $this->servicesRegistry->setApplication($this);
 
-        $bootstrap = new Bootstrap();
-        $registerModules = $this->getConfiguration()
-                                ->getRegisteredModules();
+        $this->bootstrap = new Bootstrap();
+        $registeredModules = $this->getConfiguration()
+                                  ->getRegisteredModules();
 
-        $bootstrap->registerModules($registerModules, $this);
+        $this->bootstrap->loadModulesConfigs($registeredModules, $this);
+    }
 
-        return $bootstrap;
+    /**
+     * @return ApplicationInterface
+     */
+    public function bootstrap(): ApplicationInterface
+    {
+        $this->bootstrap->registerModules();
+
+        return $this;
     }
 
     /**

@@ -35,7 +35,9 @@ class UnitTest extends TestCase
 
         $appConfig = new ApplicationConfiguration();
 
-        $this->setApplication(new DummyApplication($appConfig));
+        $this->setApplication(
+            (new DummyApplication($appConfig))->bootstrap()
+        );
     }
 
     /**

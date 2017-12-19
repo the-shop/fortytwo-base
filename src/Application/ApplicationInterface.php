@@ -31,9 +31,16 @@ interface ApplicationInterface
     public function run(): ApplicationInterface;
 
     /**
-     * @return Bootstrap
+     * Instantiates `Bootstrap`, loads modules configs
      */
-    public function bootstrap(): Bootstrap;
+    public function initialize();
+
+    /**
+     * Registers everything to application
+     *
+     * @return ApplicationInterface
+     */
+    public function bootstrap(): ApplicationInterface;
 
     /**
      * @param string $eventName
