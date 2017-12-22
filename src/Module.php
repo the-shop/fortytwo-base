@@ -5,6 +5,7 @@ namespace Framework\Base;
 use Framework\Base\Application\ApplicationConfigurationInterface;
 use Framework\Base\Application\ApplicationInterface;
 use Framework\Base\Module\BaseModule;
+use Framework\Base\Repository\GenericRepository;
 
 /**
  * Class Module
@@ -85,5 +86,40 @@ class Module extends BaseModule
                 $repositoryManager->setPrimaryAdapter($model, new $primaryAdapter());
             }
         }
+
+        // Register resources and models fields
+        if (
+            empty(
+            $models = $this->getApplication()
+                           ->getConfiguration()
+                           ->getPathValue('models')
+            ) === false
+        ) {
+            // Format models configuration
+            $modelsConfiguration = $this->generateModelsConfiguration($models);
+
+            // Register resources and model fields
+            $repositoryManager->registerResources($modelsConfiguration['resources'])
+                              ->registerModelFields($modelsConfiguration['modelFields']);
+        }
+    }
+
+    /**
+     * @param $modelsConfig
+     *
+     * @return array
+     */
+    private function generateModelsConfiguration(array $modelsConfig)
+    {
+        $generatedConfiguration = [
+            'resources' => [],
+            'modelFields' => [],
+        ];
+        foreach ($modelsConfig as $modelName => $options) {
+            $generatedConfiguration['resources'][$options['collection']] = GenericRepository::class;
+            $generatedConfiguration['modelFields'][$options['collection']] = $options['fields'];
+        }
+
+        return $generatedConfiguration;
     }
 }
