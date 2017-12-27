@@ -1,5 +1,8 @@
 <?php
 
+use Framework\Base\Model\GenericModel;
+use Framework\Base\Repository\GenericRepository;
+
 return [
     'env' => [
         'DATABASE_NAME' => getenv('DATABASE_NAME'),
@@ -11,5 +14,8 @@ return [
         'RABBIT_MQ_PASSWORD' => getenv('RABBIT_MQ_PASSWORD'),
         'FILE_LOGGER_FILE_NAME' => getenv('FILE_LOGGER_FILE_NAME'),
         'FILE_LOGGER_FILE_DIR_PATH' => getenv('FILE_LOGGER_FILE_DIR_PATH'),
+    ],
+    'repositories' => [
+        GenericModel::class => GenericRepository::class,
     ],
 ];

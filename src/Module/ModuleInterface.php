@@ -12,11 +12,15 @@ interface ModuleInterface extends ApplicationAwareInterface
 {
     /**
      * Load module configuration into application configuration instance
+     *
+     * @return void
      */
     public function loadConfig();
 
     /**
      * Bootstrap module
+     *
+     * @return void
      */
     public function bootstrap();
 
